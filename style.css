@@ -149,4 +149,14 @@ main { padding: 40px 5%; }
     .hero h1 { font-size: 1.8rem; }
     
     main { padding: 20px 5%; }
+    .modal {
+    /* This tells the browser how to handle the welcome modal fade effect */
+    transition: opacity 0.3s ease; 
+    opacity: 1;
+}
+
+.modal-content h2 {
+    margin-bottom: 10px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 }
