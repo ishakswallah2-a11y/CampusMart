@@ -25,10 +25,13 @@ document.getElementById('postItemForm').addEventListener('submit', function(e) {
     
     const itemName = document.getElementById('itemName').value;
     const itemPrice = document.getElementById('itemPrice').value;
-    const sellerPhone = document.getElementById('sellerPhone').value; // Get the number
+    
+    // FIX: This line now removes any non-numbers (spaces, +, -) 
+    // to ensure the WhatsApp link doesn't break!
+    const rawPhone = document.getElementById('sellerPhone').value;
+    const sellerPhone = rawPhone.replace(/\D/g, ''); 
 
     // 1. Create the WhatsApp Link dynamically
-    // This uses the phone number typed in the form
     const whatsappLink = `https://wa.me/${sellerPhone}?text=Hello, I saw your listing for ${itemName} on CampusMart and I'm interested!`;
 
     // 2. Create the New Product Card
