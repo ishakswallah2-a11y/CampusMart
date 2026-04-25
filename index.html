@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SukuuMart | UENR Student Hub</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <nav>
+            <div class="logo">Sukuu<span>Mart</span></div>
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#sell-item">Sell Item</a></li>
+                <li><a href="#listings">Categories</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h1>Campus Essentials, Simplified.</h1>
+        <p>Buy and sell items within the UENR community instantly.</p>
+    </section>
+
+    <main>
+        <h2>✨ New Listings on Campus</h2>
+        <div class="product-grid" id="listings">
+            <div class="card">
+                <div class="badge">Sample</div>
+                <img src="lamp.jpg" alt="Study Lamp" class="product-img">
+                <h3>Rechargeable Study Lamp</h3>
+                <p class="price">85 GHS</p>
+                <button class="buy-btn">Chat with Seller</button>
+            </div>
+
+            <div class="card">
+                <div class="badge">Kitchen</div>
+                <img src="kettle.jpg" alt="Electric Kettle" class="product-img">
+                <h3>1.5L Electric Kettle</h3>
+                <p class="price">120 GHS</p>
+                <button class="buy-btn">Chat with Seller</button>
+            </div>
+        </div>
+    </main>
+
+    <section id="sell-item" class="sell-section">
+        <h2>Turn Your Gear into Cash</h2>
+        <p style="text-align:center; color:#666; margin-bottom: 20px;">Post your item and reach the UENR community instantly.</p>
+        
+        <form id="postItemForm" class="post-form">
+            <div class="form-group">
+                <label>Item Name</label>
+                <input type="text" id="itemName" placeholder="e.g. Rice Cooker" required>
+            </div>
+            <div class="form-group">
+                <label>Category</label>
+                <select id="itemCategory">
+                    <option value="hostel">Hostel Essentials</option>
+                    <option value="academic">Academic Gear</option>
+                    <option value="electronics">Electronics & Repair</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Price (GHS)</label>
+                <input type="number" id="itemPrice" placeholder="0.00" required>
+            </div>
+            <div class="form-group">
+                <label>Your WhatsApp Number</label>
+                <input type="tel" id="sellerPhone" placeholder="054XXXXXXX" required>
+            </div>
+            
+            <button type="submit" class="submit-btn">List Item Now</button>
+        </form>
+    </section>
+
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <div class="icon" style="font-size: 3rem;">🚀</div>
+            <h2>Success!</h2>
+            <p>Your request has been processed.</p>
+            <button onclick="closeModal()" class="close-btn" style="margin-top: 15px; padding: 10px 20px; cursor: pointer;">Awesome!</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
