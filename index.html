@@ -9,10 +9,24 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
     <link rel="apple-touch-icon" href="logo-icon.png">
-
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
+    <nav class="bottom-nav">
+        <a href="#home" class="nav-item">
+            <span>🏠</span>
+            <p>Home</p>
+        </a>
+        <a href="#sell-item" class="nav-item">
+            <span>➕</span>
+            <p>Sell</p>
+        </a>
+        <a href="https://wa.me/233XXXXXXXXX" class="nav-item">
+            <span>🙋‍♂️</span>
+            <p>Support</p>
+        </a>
+    </nav>
 
     <header>
         <nav>
@@ -33,22 +47,7 @@
     <main>
         <h2>✨ New Listings on Campus</h2>
         <div class="product-grid" id="listings">
-            <div class="card">
-                <div class="badge">Sample</div>
-                <img src="lamp.jpg" alt="Study Lamp" class="product-img">
-                <h3>Rechargeable Study Lamp</h3>
-                <p class="price">85 GHS</p>
-                <button class="buy-btn">Chat with Seller</button>
             </div>
-
-            <div class="card">
-                <div class="badge">Kitchen</div>
-                <img src="kettle.jpg" alt="Electric Kettle" class="product-img">
-                <h3>1.5L Electric Kettle</h3>
-                <p class="price">120 GHS</p>
-                <button class="buy-btn">Chat with Seller</button>
-            </div>
-        </div>
     </main>
 
     <section id="sell-item" class="sell-section">
@@ -89,16 +88,36 @@
             <button onclick="closeModal()" class="close-btn" style="margin-top: 15px; padding: 10px 20px; cursor: pointer;">Awesome!</button>
         </div>
     </div>
+
     <div id="welcomeModal" class="modal" style="display: flex;"> 
-    <div class="modal-content" style="max-width: 320px;">
-        <div class="icon" style="font-size: 3.5rem;">🎓</div>
-        <h2 style="color: #2e7d32;">Welcome to CampusMart</h2>
-        <p style="margin: 15px 0; color: #555; line-height: 1.5;">
-            The official UENR hub to buy and sell. Connect with students, find deals, and trade safely!
-        </p>
-        <button onclick="closeWelcome()" class="submit-btn" style="background: #2e7d32;">Get Started</button>
+        <div class="modal-content" style="max-width: 320px;">
+            <div class="icon" style="font-size: 3.5rem;">🎓</div>
+            <h2 style="color: #2e7d32;">Welcome to CampusMart</h2>
+            <p style="margin: 15px 0; color: #555; line-height: 1.5;">
+                The official UENR hub to buy and sell. Connect with students, find deals, and trade safely!
+            </p>
+            <button onclick="closeWelcome()" class="submit-btn" style="background: #2e7d32;">Get Started</button>
+        </div>
     </div>
-</div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <script>
+      // These keys are unique to your "CampusMart" project on the Acer
+      const firebaseConfig = {
+        apiKey: "AIzaSyDWcC4KAKKsiKWKSbn2yJiDH...", 
+        authDomain: "campusmart-5c975.firebaseapp.com",
+        projectId: "campusmart-5c975",
+        storageBucket: "campusmart-5c975.firebasestorage.app",
+        messagingSenderId: "184864282111",
+        appId: "1:184864282111:web:3a0e0c9a7bafa68fea03ca"
+      };
+
+      // Initialize Firebase and the Database
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+    </script>
 
     <script src="script.js"></script>
 </body>
