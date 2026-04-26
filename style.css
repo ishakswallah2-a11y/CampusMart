@@ -1,18 +1,34 @@
 /* --- Base Styles --- */
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-body { background-color: #f4f7f6; color: #333; scroll-behavior: smooth; }
 
-/* --- Nav & Hero --- */
-nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 5%; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+body { 
+    background-color: #f4f7f6; 
+    color: #333; 
+    scroll-behavior: smooth; 
+    /* Important: Adds space at the bottom so content isn't hidden behind the nav bar */
+    padding-bottom: 80px; 
+}
+
+/* --- Navigation (Top Bar) --- */
+/* We call this top-nav in the HTML now to distinguish it from the bottom bar */
+.top-nav { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 1rem 5%; 
+    background: white; 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+}
 
 .logo { font-size: 1.6rem; font-weight: bold; color: #2e7d32; letter-spacing: -1px; }
 .logo span { color: #ffa000; font-weight: 900; }
 
-nav ul { display: flex; list-style: none; }
-nav ul li { margin-left: 20px; }
-nav ul li a { text-decoration: none; color: #333; font-weight: 500; font-size: 0.95rem; transition: 0.3s; }
-nav ul li a:hover { color: #2e7d32; }
+.top-nav ul { display: flex; list-style: none; }
+.top-nav ul li { margin-left: 20px; }
+.top-nav ul li a { text-decoration: none; color: #333; font-weight: 500; font-size: 0.95rem; transition: 0.3s; }
+.top-nav ul li a:hover { color: #2e7d32; }
 
+/* --- Hero Section --- */
 .hero { text-align: center; padding: 80px 20px; background: #2e7d32; color: white; }
 .hero h1 { font-size: 2.5rem; margin-bottom: 10px; }
 
@@ -30,133 +46,56 @@ main { padding: 40px 5%; }
     border: 1px solid #eee;
 }
 
-.card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 20px rgba(0,0,0,0.15);
-}
+.card:hover { transform: translateY(-8px); box-shadow: 0 12px 20px rgba(0,0,0,0.15); }
 
 .badge { background: #e8f5e9; color: #2e7d32; padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; display: inline-block; margin-bottom: 10px; }
 
-.product-img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-    border-radius: 10px;
-    margin-bottom: 15px;
-    display: block;
-    background-color: #eee; /* Placeholder color if image is missing */
-}
+.product-img { width: 100%; height: 200px; object-fit: cover; border-radius: 10px; margin-bottom: 15px; display: block; background-color: #eee; }
 
 .price { font-weight: bold; font-size: 1.3rem; color: #27ae60; margin: 10px 0; }
 
-.buy-btn { 
-    width: 100%; 
-    padding: 12px; 
-    background: #2e7d32; 
-    color: white; 
-    border: none; 
-    border-radius: 8px; 
-    font-weight: bold;
-    cursor: pointer; 
-    transition: 0.3s;
-}
-
+.buy-btn { width: 100%; padding: 12px; background: #2e7d32; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
 .buy-btn:hover { background: #1b5e20; }
 
 /* --- Form Section --- */
 .sell-section { padding: 60px 5%; background: #f0f2f0; }
 .sell-section h2 { text-align: center; margin-bottom: 20px; }
 
-.post-form { 
-    width: 95%; 
-    max-width: 500px; 
-    margin: auto; 
-    background: white; 
-    padding: 30px; 
-    border-radius: 15px; 
-    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-}
+.post-form { width: 95%; max-width: 500px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
 
 .form-group { margin-bottom: 20px; display: flex; flex-direction: column; }
 .form-group label { font-weight: bold; font-size: 0.9rem; color: #555; margin-bottom: 5px; }
-
-.form-group input, 
-.form-group select {
-    width: 100%;
-    padding: 12px;
-    border: 1.5px solid #dde;
-    border-radius: 8px;
-    font-size: 1rem;
-    outline: none;
-    transition: 0.3s;
-}
-
+.form-group input, .form-group select { width: 100%; padding: 12px; border: 1.5px solid #dde; border-radius: 8px; font-size: 1rem; outline: none; transition: 0.3s; }
 .form-group input:focus { border-color: #2e7d32; }
 
-.submit-btn { 
-    width: 100%; 
-    padding: 14px; 
-    background: #ffa000; 
-    color: white; 
-    border: none; 
-    border-radius: 8px; 
-    font-weight: bold; 
-    font-size: 1rem;
-    cursor: pointer; 
-    box-shadow: 0 4px 10px rgba(255, 160, 0, 0.3);
+.submit-btn { width: 100%; padding: 14px; background: #ffa000; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 10px rgba(255, 160, 0, 0.3); }
+
+/* --- FIXED: Bottom Navigation (Visualized Below) --- */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: white;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    padding: 10px 0;
+    border-top: 1px solid #ddd;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    z-index: 2000; /* Keeps it above everything else */
 }
 
-/* --- Modal --- */
-.modal { 
-    display: none; 
-    position: fixed; 
-    z-index: 2000; 
-    top: 0; left: 0; 
-    width: 100%; height: 100%; 
-    background: rgba(0,0,0,0.8); 
-    justify-content: center; 
-    align-items: center; 
-}
+.nav-item { text-align: center; text-decoration: none; color: #555; font-size: 0.8rem; }
+.nav-item span { font-size: 1.5rem; display: block; }
 
-.modal-content { 
-    background: white; 
-    padding: 40px; 
-    border-radius: 20px; 
-    text-align: center; 
-    max-width: 90%;
-}
+/* --- Modals --- */
+.modal { display: none; position: fixed; z-index: 3000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; transition: opacity 0.3s ease; }
+.modal-content { background: white; padding: 40px; border-radius: 20px; text-align: center; max-width: 90%; }
 
 /* --- Mobile Responsive Fix --- */
 @media (max-width: 600px) {
-    nav {
-        flex-direction: column;
-        padding: 15px;
-    }
-
-    nav ul {
-        margin-top: 15px;
-        margin-left: 0;
-        justify-content: center;
-        width: 100%;
-        gap: 10px;
-    }
-
-    nav ul li {
-        margin: 0;
-    }
-
-    .hero { padding: 40px 20px; }
+    .top-nav ul { display: none; } /* Hide text links on small screens */
     .hero h1 { font-size: 1.8rem; }
-    
     main { padding: 20px 5%; }
-    .modal {
-    /* This tells the browser how to handle the welcome modal fade effect */
-    transition: opacity 0.3s ease; 
-    opacity: 1;
-}
-
-.modal-content h2 {
-    margin-bottom: 10px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
 }
