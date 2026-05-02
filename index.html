@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CampusMart | UENR Student Hub</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <link rel="apple-touch-icon" href="logo.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <nav class="top-nav">
+            <div class="logo">Campus<span>Mart</span></div>
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#sell-item">Sell Item</a></li>
+                <li><a href="#listings">Categories</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h1>Campus Essentials, Simplified.</h1>
+        <p>Buy and sell items within the UENR community instantly.</p>
+    </section>
+
+    <main>
+        <h2>✨ New Listings on Campus</h2>
+        <div class="product-grid" id="listings">
+            </div>
+    </main>
+
+    <section id="sell-item" class="sell-section">
+        <h2>Turn Your Gear into Cash</h2>
+        <p style="text-align:center; color:#666; margin-bottom: 20px;">Post your item and reach the UENR community instantly.</p>
+        
+        <form id="postItemForm" class="post-form">
+            <div class="form-group">
+                <label>Item Name</label>
+                <input type="text" id="itemName" placeholder="e.g. Rice Cooker" required>
+            </div>
+            <div class="form-group">
+                <label>Category</label>
+                <select id="itemCategory">
+                    <option value="Hostel Essentials">Hostel Essentials</option>
+                    <option value="Academic Gear">Academic Gear</option>
+                    <option value="Electronics">Electronics & Repair</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Price (GHS)</label>
+                <input type="number" id="itemPrice" placeholder="0.00" required>
+            </div>
+            <div class="form-group">
+                <label>Your WhatsApp Number</label>
+                <input type="tel" id="sellerPhone" placeholder="054XXXXXXX" required>
+            </div>
+            
+            <button type="submit" class="submit-btn">List Item Now</button>
+        </form>
+    </section>
+
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <div class="icon" style="font-size: 3rem;">🚀</div>
+            <h2>Success!</h2>
+            <p>Your request has been processed.</p>
+            <button onclick="closeModal()" class="close-btn">Awesome!</button>
+        </div>
+    </div>
+
+    <div id="welcomeModal" class="modal" style="display: flex;"> 
+        <div class="modal-content">
+            <div class="icon" style="font-size: 3.5rem;">🎓</div>
+            <h2>Welcome to CampusMart</h2>
+            <p>The official UENR hub to buy and sell. Connect with students, find deals, and trade safely!</p>
+            <button onclick="closeWelcome()" class="submit-btn">Get Started</button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyDWcC4KAKKsiKWKSbn2yJiDHpLXZm1Ywk",
+        authDomain: "campusmart-5c975.firebaseapp.com",
+        projectId: "campusmart-5c975",
+        storageBucket: "campusmart-5c975.firebasestorage.app",
+        messagingSenderId: "184864282111",
+        appId: "1:184864282111:web:3a0e0c9a7bafa68fea03ca"
+      };
+
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+    </script>
+
+    <script src="script.js"></script>
+
+    <nav class="bottom-nav">
+        <a href="#home" class="nav-item">
+            <span>🏠</span>
+            <p>Home</p>
+        </a>
+        <a href="#sell-item" class="nav-item">
+            <span>➕</span>
+            <p>Sell</p>
+        </a>
+        <a href="https://wa.me/233240000000" class="nav-item">
+            <span>🙋‍♂️</span>
+            <p>Support</p>
+        </a>
+    </nav>
+    
+</body>
+</html>
+VV
