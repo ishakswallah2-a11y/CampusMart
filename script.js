@@ -15,19 +15,27 @@ db.collection("listings").orderBy("createdAt", "desc")
             const itemPrice = item.price || "0";
             const itemCategory = item.category || "General";
 
+            // LOGIC: Choose emoji based on category
+            let categoryEmoji = "📦"; 
+            if (itemCategory === "Hostel Essentials") categoryEmoji = "🛌";
+            if (itemCategory === "Academic Gear") categoryEmoji = "📚";
+            if (itemCategory === "Electronics") categoryEmoji = "🔌";
+
             const whatsappLink = `https://wa.me/${sellerPhone}?text=Hello, I saw your listing for ${itemName} on CampusMart!`;
 
             const newCard = document.createElement('div');
             newCard.className = 'card';
             newCard.innerHTML = `
                 <div class="badge">New</div>
-                <div class="product-img">📦</div> 
+                <div class="product-img">${categoryEmoji}</div> 
                 <div class="card-content">
-                    <h3>${itemName}</h3>
-                    <p class="category" style="font-size: 0.8rem; color: gray;">${itemCategory}</p>
+                    <div class="info-group">
+                        <h3>${itemName}</h3>
+                        <p class="category">${itemCategory}</p>
+                    </div>
                     <p class="price">GHS ${itemPrice}</p>
-                    <a href="${whatsappLink}" target="_blank" class="buy-btn" style="text-decoration: none; display: block; text-align: center;">
-                        Chat with Seller
+                    <a href="${whatsappLink}" target="_blank" class="buy-btn">
+                        Chat
                     </a>
                 </div>
             `;
@@ -37,7 +45,7 @@ db.collection("listings").orderBy("createdAt", "desc")
         console.error("Listener Error: ", error);
     });
 
-// --- 2. GLOBAL UI FUNCTIONS (Fixed for Phone) ---
+// --- 2. GLOBAL UI FUNCTIONS ---
 window.showSuccess = function(message = "Your request has been processed!") {
     const modal = document.getElementById('successModal');
     if (modal) {
@@ -99,7 +107,7 @@ if (postForm) {
             console.error("Firebase Error: ", error);
             submitBtn.disabled = false;
             submitBtn.innerText = "List Item Now";
-            alert("Firebase Rules Error! Ensure they are set to 'allow read, write: if true;'");
+            alert("Error uploading. Check your internet connection.");
         });
     });
 }
