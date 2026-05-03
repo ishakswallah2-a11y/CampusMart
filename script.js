@@ -1,17 +1,13 @@
-// --- 1. THE REAL-TIME LISTENER (The "Sync" Fix) ---
+// --- 1. THE REAL-TIME LISTENER ---
 db.collection("listings").orderBy("createdAt", "desc")
     .onSnapshot((snapshot) => {
         const listingsContainer = document.getElementById('listings');
-        
-        // SAFETY CHECK: If the HTML element doesn't exist, stop here
         if (!listingsContainer) return; 
 
         listingsContainer.innerHTML = ""; 
 
         snapshot.forEach((doc) => {
             const item = doc.data();
-            
-            // If the item is still being created in the cloud, skip it for a split second
             if (!item.name) return; 
 
             const sellerPhone = item.phone || "";
@@ -41,22 +37,22 @@ db.collection("listings").orderBy("createdAt", "desc")
         console.error("Listener Error: ", error);
     });
 
-// --- 2. UI FUNCTIONS ---
-function showSuccess(message = "Your request has been processed!") {
+// --- 2. GLOBAL UI FUNCTIONS (Fixed for Phone) ---
+window.showSuccess = function(message = "Your request has been processed!") {
     const modal = document.getElementById('successModal');
     if (modal) {
         const p = modal.querySelector('p');
         if(p) p.innerText = message;
         modal.style.display = 'flex';
     }
-}
+};
 
-function closeModal() {
+window.closeModal = function() {
     const modal = document.getElementById('successModal');
     if (modal) modal.style.display = 'none';
-}
+};
 
-function closeWelcome() {
+window.closeWelcome = function() {
     const welcomeModal = document.getElementById('welcomeModal');
     if(welcomeModal) {
         welcomeModal.style.opacity = '0';
@@ -64,7 +60,7 @@ function closeWelcome() {
             welcomeModal.style.display = 'none';
         }, 300);
     }
-}
+};
 
 // --- 3. HANDLE THE "SELL ITEM" FORM ---
 const postForm = document.getElementById('postItemForm');
@@ -97,13 +93,13 @@ if (postForm) {
             this.reset();
             submitBtn.disabled = false;
             submitBtn.innerText = "List Item Now";
-            showSuccess("Listing Live! Your item is now saved in the UENR Cloud!");
+            window.showSuccess("Listing Live! Your item is now saved in the UENR Cloud!");
         })
         .catch((error) => {
             console.error("Firebase Error: ", error);
             submitBtn.disabled = false;
             submitBtn.innerText = "List Item Now";
-            alert("Check your Firebase Rules! Set them to 'allow read, write: if true;'");
+            alert("Firebase Rules Error! Ensure they are set to 'allow read, write: if true;'");
         });
     });
 }
