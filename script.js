@@ -1,16 +1,23 @@
 // --- 1. THE REAL-TIME LISTENER (The "Sync" Fix) ---
-// This part runs as soon as the page loads and watches for new posts
 db.collection("listings").orderBy("createdAt", "desc")
     .onSnapshot((snapshot) => {
         const listingsContainer = document.getElementById('listings');
-        listingsContainer.innerHTML = ""; // Clear existing cards to avoid duplicates
+        
+        // SAFETY CHECK: If the HTML element doesn't exist, stop here
+        if (!listingsContainer) return; 
+
+        listingsContainer.innerHTML = ""; 
 
         snapshot.forEach((doc) => {
             const item = doc.data();
-            const sellerPhone = item.phone;
-            const itemName = item.name;
-            const itemPrice = item.price;
-            const itemCategory = item.category;
+            
+            // If the item is still being created in the cloud, skip it for a split second
+            if (!item.name) return; 
+
+            const sellerPhone = item.phone || "";
+            const itemName = item.name || "Unnamed Item";
+            const itemPrice = item.price || "0";
+            const itemCategory = item.category || "General";
 
             const whatsappLink = `https://wa.me/${sellerPhone}?text=Hello, I saw your listing for ${itemName} on CampusMart!`;
 
@@ -37,13 +44,16 @@ db.collection("listings").orderBy("createdAt", "desc")
 // --- 2. UI FUNCTIONS ---
 function showSuccess(message = "Your request has been processed!") {
     const modal = document.getElementById('successModal');
-    const p = modal.querySelector('p');
-    if(p) p.innerText = message;
-    modal.style.display = 'flex';
+    if (modal) {
+        const p = modal.querySelector('p');
+        if(p) p.innerText = message;
+        modal.style.display = 'flex';
+    }
 }
 
 function closeModal() {
-    document.getElementById('successModal').style.display = 'none';
+    const modal = document.getElementById('successModal');
+    if (modal) modal.style.display = 'none';
 }
 
 function closeWelcome() {
@@ -57,43 +67,43 @@ function closeWelcome() {
 }
 
 // --- 3. HANDLE THE "SELL ITEM" FORM ---
-document.getElementById('postItemForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const itemName = document.getElementById('itemName').value;
-    const itemPrice = document.getElementById('itemPrice').value;
-    const itemCategory = document.getElementById('itemCategory').value;
-    
-    let rawPhone = document.getElementById('sellerPhone').value.replace(/\D/g, ''); 
-    if (rawPhone.startsWith('0')) {
-        rawPhone = '233' + rawPhone.substring(1);
-    }
-    const sellerPhone = rawPhone;
+const postForm = document.getElementById('postItemForm');
+if (postForm) {
+    postForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const itemName = document.getElementById('itemName').value;
+        const itemPrice = document.getElementById('itemPrice').value;
+        const itemCategory = document.getElementById('itemCategory').value;
+        
+        let rawPhone = document.getElementById('sellerPhone').value.replace(/\D/g, ''); 
+        if (rawPhone.startsWith('0')) {
+            rawPhone = '233' + rawPhone.substring(1);
+        }
+        const sellerPhone = rawPhone;
 
-    const submitBtn = this.querySelector('button');
-    submitBtn.disabled = true;
-    submitBtn.innerText = "Uploading to Cloud...";
+        const submitBtn = this.querySelector('button');
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Uploading to Cloud...";
 
-    // Save to Firebase
-    db.collection("listings").add({
-        name: itemName,
-        price: itemPrice,
-        category: itemCategory,
-        phone: sellerPhone,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp() 
-    })
-    .then(() => {
-        // We don't need to manually create the card here anymore!
-        // The .onSnapshot() above will see the new data and add it for us.
-        this.reset();
-        submitBtn.disabled = false;
-        submitBtn.innerText = "List Item Now";
-        showSuccess("Listing Live! Your item is now saved in the UENR Cloud!");
-    })
-    .catch((error) => {
-        console.error("Firebase Error: ", error);
-        submitBtn.disabled = false;
-        submitBtn.innerText = "List Item Now";
-        alert("Permission Denied: Check your Firebase Rules 'Allow read, write: if true;'");
+        db.collection("listings").add({
+            name: itemName,
+            price: itemPrice,
+            category: itemCategory,
+            phone: sellerPhone,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp() 
+        })
+        .then(() => {
+            this.reset();
+            submitBtn.disabled = false;
+            submitBtn.innerText = "List Item Now";
+            showSuccess("Listing Live! Your item is now saved in the UENR Cloud!");
+        })
+        .catch((error) => {
+            console.error("Firebase Error: ", error);
+            submitBtn.disabled = false;
+            submitBtn.innerText = "List Item Now";
+            alert("Check your Firebase Rules! Set them to 'allow read, write: if true;'");
+        });
     });
-});
+}
