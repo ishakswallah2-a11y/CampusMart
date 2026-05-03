@@ -15,7 +15,6 @@ db.collection("listings").orderBy("createdAt", "desc")
             const itemPrice = item.price || "0";
             const itemCategory = item.category || "General";
 
-            // LOGIC: Choose emoji based on category
             let categoryEmoji = "📦"; 
             if (itemCategory === "Hostel Essentials") categoryEmoji = "🛌";
             if (itemCategory === "Academic Gear") categoryEmoji = "📚";
@@ -34,9 +33,7 @@ db.collection("listings").orderBy("createdAt", "desc")
                         <p class="category">${itemCategory}</p>
                     </div>
                     <p class="price">GHS ${itemPrice}</p>
-                    <a href="${whatsappLink}" target="_blank" class="buy-btn">
-                        Chat
-                    </a>
+                    <a href="${whatsappLink}" target="_blank" class="buy-btn">Chat</a>
                 </div>
             `;
             listingsContainer.appendChild(newCard);
@@ -70,6 +67,10 @@ window.closeWelcome = function() {
     }
 };
 
+window.closeAuthModal = function() {
+    document.getElementById('authModal').style.display = 'none';
+};
+
 // --- 3. HANDLE THE "SELL ITEM" FORM ---
 const postForm = document.getElementById('postItemForm');
 if (postForm) {
@@ -88,7 +89,7 @@ if (postForm) {
 
         const submitBtn = this.querySelector('button');
         submitBtn.disabled = true;
-        submitBtn.innerText = "Uploading to Cloud...";
+        submitBtn.innerText = "Uploading...";
 
         db.collection("listings").add({
             name: itemName,
@@ -101,13 +102,64 @@ if (postForm) {
             this.reset();
             submitBtn.disabled = false;
             submitBtn.innerText = "List Item Now";
-            window.showSuccess("Listing Live! Your item is now saved in the UENR Cloud!");
+            window.showSuccess("Listing Live in the UENR Cloud!");
         })
         .catch((error) => {
-            console.error("Firebase Error: ", error);
             submitBtn.disabled = false;
             submitBtn.innerText = "List Item Now";
-            alert("Error uploading. Check your internet connection.");
+            alert("Error: Check your connection.");
         });
     });
 }
+
+// --- 4. AUTHENTICATION LOGIC ---
+let isLoggingIn = true; 
+
+// Open Auth Modal
+document.getElementById('accountBtn').addEventListener('click', (e) => {
+    e.preventDefault();
+    document.getElementById('authModal').style.display = 'flex';
+});
+
+// Toggle Login/Sign Up
+document.getElementById('toggleAuth').addEventListener('click', () => {
+    isLoggingIn = !isLoggingIn;
+    document.getElementById('authTitle').innerText = isLoggingIn ? "Welcome Back" : "Create Account";
+    document.getElementById('authSubmitBtn').innerText = isLoggingIn ? "Login" : "Sign Up";
+    document.getElementById('toggleAuth').innerText = isLoggingIn ? "Sign Up" : "Login";
+});
+
+// Handle Auth Submission
+document.getElementById('authForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const email = document.getElementById('authEmail').value;
+    const password = document.getElementById('authPassword').value;
+    const btn = document.getElementById('authSubmitBtn');
+
+    btn.disabled = true;
+    btn.innerText = "Connecting...";
+
+    if (isLoggingIn) {
+        auth.signInWithEmailAndPassword(email, password)
+            .then((user) => {
+                window.closeAuthModal();
+                window.showSuccess("Signed in successfully!");
+            })
+            .catch((err) => {
+                alert(err.message);
+                btn.disabled = false;
+                btn.innerText = "Login";
+            });
+    } else {
+        auth.createUserWithEmailAndPassword(email, password)
+            .then(() => {
+                window.closeAuthModal();
+                window.showSuccess("Account Created!");
+            })
+            .catch((err) => {
+                alert(err.message);
+                btn.disabled = false;
+                btn.innerText = "Sign Up";
+            });
+    }
+});

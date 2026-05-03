@@ -28,7 +28,6 @@
 
     <main>
         <h2>✨ New Listings on Campus</h2>
-        <!-- Grid changed to list-style container -->
         <div class="product-grid" id="listings">
             <!-- Listings will load here automatically -->
         </div>
@@ -61,7 +60,7 @@
         </form>
     </section>
 
-    <!-- Modals -->
+    <!-- Success Modal -->
     <div id="successModal" class="modal">
         <div class="modal-content">
             <div class="icon" style="font-size: 3rem;">🚀</div>
@@ -71,6 +70,7 @@
         </div>
     </div>
 
+    <!-- Welcome Modal -->
     <div id="welcomeModal" class="modal" style="display: flex;"> 
         <div class="modal-content">
             <div class="icon" style="font-size: 3.5rem;">🎓</div>
@@ -80,8 +80,33 @@
         </div>
     </div>
 
+    <!-- Login / Sign Up Modal -->
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <h2 id="authTitle">Welcome Back</h2>
+            <p id="authDesc">Sign in to manage your UENR listings.</p>
+        
+            <form id="authForm">
+                <div class="form-group">
+                    <input type="email" id="authEmail" placeholder="Email Address" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="authPassword" placeholder="Password" required>
+                </div>
+                <button type="submit" id="authSubmitBtn" class="submit-btn">Login</button>
+            </form>
+            
+            <p style="margin-top: 15px; font-size: 0.8rem;">
+                Don't have an account? <span id="toggleAuth" style="color: #2e7d32; cursor: pointer; font-weight: bold;">Sign Up</span>
+            </p>
+            <button onclick="closeAuthModal()" class="close-btn" style="background: none; color: gray; margin-top: 10px;">Maybe Later</button>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs (Compat Version) -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
     <script>
       const firebaseConfig = {
@@ -94,6 +119,7 @@
       };
       firebase.initializeApp(firebaseConfig);
       const db = firebase.firestore();
+      const auth = firebase.auth(); // Initialize Auth
     </script>
 
     <script src="script.js"></script>
@@ -101,8 +127,7 @@
     <nav class="bottom-nav">
         <a href="#" class="nav-item"><span>🏠</span><p>Home</p></a>
         <a href="#sell-item" class="nav-item"><span>➕</span><p>Sell</p></a>
-        <!-- Changed Support to Account for Step 3 -->
-        <a href="#" class="nav-item"><span>👤</span><p>Account</p></a>
+        <a href="#" id="accountBtn" class="nav-item"><span>👤</span><p>Account</p></a>
     </nav>
     
 </body>
