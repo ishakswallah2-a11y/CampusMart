@@ -1,10 +1,10 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CampusMart | UENR</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" />
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -12,78 +12,76 @@
     <header class="main-header">
         <div class="header-top">
             <h1 class="brand-logo">Campus<span>Mart</span></h1>
+            <div class="notification-wrapper">
+                <span class="material-symbols-outlined notification-bell">notifications</span>
+                <span class="notification-badge">2</span> </div>
         </div>
-        <div class="search-container">
-            <span class="material-symbols-outlined">search</span>
-            <input type="text" id="searchInput" placeholder="Search textbooks, electronics...">
+        <div class="search-bar-container">
+            <span class="material-symbols-outlined search-icon">search</span>
+            <input type="text" id="searchInput" placeholder="Search textbooks, iPhones, rooms...">
         </div>
     </header>
 
     <main id="main-content">
-        <section id="home-page">
-            <div class="promo-banner">🚀 UENR Student Marketplace</div>
+        <section id="home-page" class="page">
+            <div class="promo-banner">🔥 Hot Deals in UENR</div>
             <div class="content-padding">
-                <h2 class="section-title">New Listings</h2>
-                <div class="product-grid" id="listings"></div>
+                <h2 class="section-title">Latest Listings</h2>
+                <div id="listings" class="product-grid"></div>
             </div>
         </section>
 
-        <section id="categories-page" style="display: none;">
+        <section id="categories-page" class="page" style="display: none;">
             <div class="content-padding">
-                <h2 class="section-title">Browse Categories</h2>
+                <h2 class="section-title">Categories</h2>
                 <div class="cat-grid">
-                    <div class="cat-card" onclick="filterCat('Electronics')"><span class="material-symbols-outlined">devices</span><p>Electronics</p></div>
-                    <div class="cat-card" onclick="filterCat('Academic')"><span class="material-symbols-outlined">menu_book</span><p>Academic</p></div>
+                    <div class="cat-card" onclick="filterCat('Electronics')"><span class="material-symbols-outlined">devices</span><p>Tech</p></div>
+                    <div class="cat-card" onclick="filterCat('Academic')"><span class="material-symbols-outlined">menu_book</span><p>Books</p></div>
                     <div class="cat-card" onclick="filterCat('Hostel')"><span class="material-symbols-outlined">bed</span><p>Hostel</p></div>
                 </div>
             </div>
         </section>
 
-        <section id="sell-page" style="display: none;">
+        <section id="sell-page" class="page" style="display: none;">
             <div class="content-padding">
-                <h2 class="section-title">Sell an Item</h2>
+                <h2 class="section-title">Sell Your Gear</h2>
                 <form id="postItemForm" class="pro-form">
-                    <input type="text" id="itemName" placeholder="Item Name" required>
+                    <input type="text" id="itemName" placeholder="What are you selling?" required>
                     <select id="itemCategory">
                         <option value="Electronics">Electronics</option>
-                        <option value="Academic">Academic</option>
-                        <option value="Hostel">Hostel Gear</option>
+                        <option value="Academic">Academic / Books</option>
+                        <option value="Hostel">Hostel Essentials</option>
                     </select>
                     <input type="number" id="itemPrice" placeholder="Price (GHS)" required>
-                    <textarea id="itemDescription" placeholder="Specs (e.g. iPhone 12, 128GB, 90% BH)" rows="5"></textarea>
+                    <textarea id="itemDescription" placeholder="Specs (e.g. 128GB, 85% Health)" rows="4"></textarea>
                     <input type="tel" id="sellerPhone" placeholder="WhatsApp Number" required>
-                    <button type="submit" class="submit-btn">POST NOW</button>
+                    <button type="submit" class="submit-btn">LIST ITEM NOW</button>
                 </form>
             </div>
         </section>
 
-        <section id="ads-page" style="display: none;">
-            <div class="content-padding">
-                <h2 class="section-title">My Listings</h2>
-                <div id="userListings" class="product-grid">
-                    <p class="empty-msg">You haven't posted any items yet.</p>
-                </div>
-            </div>
-        </section>
-
-        <section id="account-page" style="display: none;">
+        <section id="account-page" class="page" style="display: none;">
             <div class="profile-card">
                 <div class="avatar">I</div>
                 <h3>Ishak</h3>
-                <p>UENR Student Vendor</p>
+                <p>UENR Verified Student</p>
             </div>
-            <div class="settings-list">
-                <div class="setting-item"><span>Dark Mode</span><button class="toggle-btn">OFF</button></div>
-                <div class="setting-item"><span>Help & Support</span><span class="material-symbols-outlined">chevron_right</span></div>
-                <div class="setting-item logout"><span>Logout</span><span class="material-symbols-outlined">logout</span></div>
+            <div class="settings-group">
+                <div class="setting-row">
+                    <p>Dark Mode</p>
+                    <label class="switch">
+                        <input type="checkbox" id="darkModeToggle" onclick="toggleDarkMode()">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
             </div>
         </section>
     </main>
 
-    <div id="detailsModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <div id="modalBody"></div>
+    <div id="detailsModal" class="modal-overlay">
+        <div class="modal-box">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <div id="modalContent"></div>
         </div>
     </div>
 
@@ -104,11 +102,22 @@
     <script src="script.js"></script>
 
     <nav class="bottom-nav">
-        <div class="nav-item active" onclick="showPage('home-page', this)"><span class="material-symbols-outlined">home</span><p>Home</p></div>
-        <div class="nav-item" onclick="showPage('categories-page', this)"><span class="material-symbols-outlined">grid_view</span><p>Cats</p></div>
-        <div class="nav-item sell-btn" onclick="showPage('sell-page', this)"><span class="material-symbols-outlined">add_circle</span><p>Sell</p></div>
-        <div class="nav-item" onclick="showPage('ads-page', this)"><span class="material-symbols-outlined">inventory_2</span><p>My Ads</p></div>
-        <div class="nav-item" onclick="showPage('account-page', this)"><span class="material-symbols-outlined">person</span><p>Account</p></div>
+        <div class="nav-btn active" onclick="showPage('home-page', this)">
+            <span class="material-symbols-outlined">home</span>
+            <span class="nav-label">Home</span>
+        </div>
+        <div class="nav-btn" onclick="showPage('categories-page', this)">
+            <span class="material-symbols-outlined">grid_view</span>
+            <span class="nav-label">Shop</span>
+        </div>
+        <div class="nav-btn sell-action" onclick="showPage('sell-page', this)">
+            <span class="material-symbols-outlined">add_circle</span>
+            <span class="nav-label">Sell</span>
+        </div>
+        <div class="nav-btn" onclick="showPage('account-page', this)">
+            <span class="material-symbols-outlined">person</span>
+            <span class="nav-label">Account</span>
+        </div>
     </nav>
 </body>
 </html>
