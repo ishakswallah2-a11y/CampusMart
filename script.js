@@ -1,4 +1,4 @@
-// --- 1. THE REAL-TIME LISTENER ---
+// --- 1. REAL-TIME LISTENER ---
 db.collection("listings").orderBy("createdAt", "desc")
     .onSnapshot((snapshot) => {
         const listingsContainer = document.getElementById('listings');
@@ -8,24 +8,24 @@ db.collection("listings").orderBy("createdAt", "desc")
 
         snapshot.forEach((doc) => {
             const item = doc.data();
-            if (!item.name) return; 
-
             const sellerPhone = item.phone || "";
             const itemName = item.name || "Unnamed Item";
             const itemPrice = item.price || "0";
             const itemCategory = item.category || "General";
+            const itemDescription = item.description || "No specific details provided.";
 
             let categoryEmoji = "📦"; 
             if (itemCategory === "Hostel Essentials") categoryEmoji = "🛌";
             if (itemCategory === "Academic Gear") categoryEmoji = "📚";
             if (itemCategory === "Electronics") categoryEmoji = "🔌";
 
-            const whatsappLink = `https://wa.me/${sellerPhone}?text=Hello, I saw your listing for ${itemName} on CampusMart!`;
+            // Escape quotes to prevent JS errors
+            const safeName = itemName.replace(/'/g, "\\'");
+            const safeDesc = itemDescription.replace(/'/g, "\\'");
 
             const newCard = document.createElement('div');
             newCard.className = 'card';
             newCard.innerHTML = `
-                <div class="badge">New</div>
                 <div class="product-img">${categoryEmoji}</div> 
                 <div class="card-content">
                     <div class="info-group">
@@ -33,133 +33,71 @@ db.collection("listings").orderBy("createdAt", "desc")
                         <p class="category">${itemCategory}</p>
                     </div>
                     <p class="price">GHS ${itemPrice}</p>
-                    <a href="${whatsappLink}" target="_blank" class="buy-btn">Chat</a>
+                    <button onclick="openDetails('${safeName}', '${itemPrice}', '${safeDesc}', '${sellerPhone}')" class="buy-btn">View</button>
                 </div>
             `;
             listingsContainer.appendChild(newCard);
         });
-    }, (error) => {
-        console.error("Listener Error: ", error);
     });
 
-// --- 2. GLOBAL UI FUNCTIONS ---
-window.showSuccess = function(message = "Your request has been processed!") {
-    const modal = document.getElementById('successModal');
-    if (modal) {
-        const p = modal.querySelector('p');
-        if(p) p.innerText = message;
-        modal.style.display = 'flex';
-    }
-};
+// --- 2. NAVIGATION LOGIC ---
+function showPage(pageId) {
+    const pages = ['home-page', 'sell-page', 'account-page', 'categories-page'];
+    pages.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) element.style.display = 'none';
+    });
+    
+    document.getElementById(pageId).style.display = 'block';
+    window.scrollTo(0,0);
+}
 
-window.closeModal = function() {
-    const modal = document.getElementById('successModal');
-    if (modal) modal.style.display = 'none';
-};
+// --- 3. MODAL FUNCTIONS ---
+function openDetails(name, price, specs, phone) {
+    const modal = document.getElementById('detailsModal');
+    const body = document.getElementById('modalDetailsBody');
+    
+    body.innerHTML = `
+        <h2 style="color:#2e7d32;">${name}</h2>
+        <p style="font-weight:bold; color:#ffa000; font-size:1.2rem;">GHS ${price}</p>
+        <div style="background:#f4f7f6; padding:15px; border-radius:10px; margin:15px 0;">
+            <strong>Details:</strong>
+            <p style="color:#555; font-size:0.9rem;">${specs}</p>
+        </div>
+        <a href="https://wa.me/${phone}" target="_blank" class="submit-btn" style="display:block; text-align:center; text-decoration:none; background:#2e7d32;">Chat on WhatsApp</a>
+    `;
+    modal.style.display = 'flex';
+}
 
-window.closeWelcome = function() {
-    const welcomeModal = document.getElementById('welcomeModal');
-    if(welcomeModal) {
-        welcomeModal.style.opacity = '0';
-        setTimeout(() => {
-            welcomeModal.style.display = 'none';
-        }, 300);
-    }
-};
+function closeModal(id) {
+    document.getElementById(id).style.display = 'none';
+}
 
-window.closeAuthModal = function() {
-    document.getElementById('authModal').style.display = 'none';
-};
-
-// --- 3. HANDLE THE "SELL ITEM" FORM ---
+// --- 4. SELL FORM ---
 const postForm = document.getElementById('postItemForm');
 if (postForm) {
     postForm.addEventListener('submit', function(e) {
         e.preventDefault();
-        
-        const itemName = document.getElementById('itemName').value;
-        const itemPrice = document.getElementById('itemPrice').value;
-        const itemCategory = document.getElementById('itemCategory').value;
-        
-        let rawPhone = document.getElementById('sellerPhone').value.replace(/\D/g, ''); 
-        if (rawPhone.startsWith('0')) {
-            rawPhone = '233' + rawPhone.substring(1);
-        }
-        const sellerPhone = rawPhone;
+        const btn = this.querySelector('button');
+        btn.disabled = true;
+        btn.innerText = "Posting...";
 
-        const submitBtn = this.querySelector('button');
-        submitBtn.disabled = true;
-        submitBtn.innerText = "Uploading...";
+        let phone = document.getElementById('sellerPhone').value.replace(/\D/g, ''); 
+        if (phone.startsWith('0')) phone = '233' + phone.substring(1);
 
         db.collection("listings").add({
-            name: itemName,
-            price: itemPrice,
-            category: itemCategory,
-            phone: sellerPhone,
+            name: document.getElementById('itemName').value,
+            price: document.getElementById('itemPrice').value,
+            category: document.getElementById('itemCategory').value,
+            description: document.getElementById('itemDescription').value,
+            phone: phone,
             createdAt: firebase.firestore.FieldValue.serverTimestamp() 
-        })
-        .then(() => {
+        }).then(() => {
             this.reset();
-            submitBtn.disabled = false;
-            submitBtn.innerText = "List Item Now";
-            window.showSuccess("Listing Live in the UENR Cloud!");
-        })
-        .catch((error) => {
-            submitBtn.disabled = false;
-            submitBtn.innerText = "List Item Now";
-            alert("Error: Check your connection.");
+            btn.disabled = false;
+            btn.innerText = "List Item Now";
+            showPage('home-page');
+            alert("Listed Successfully!");
         });
     });
 }
-
-// --- 4. AUTHENTICATION LOGIC ---
-let isLoggingIn = true; 
-
-// Open Auth Modal
-document.getElementById('accountBtn').addEventListener('click', (e) => {
-    e.preventDefault();
-    document.getElementById('authModal').style.display = 'flex';
-});
-
-// Toggle Login/Sign Up
-document.getElementById('toggleAuth').addEventListener('click', () => {
-    isLoggingIn = !isLoggingIn;
-    document.getElementById('authTitle').innerText = isLoggingIn ? "Welcome Back" : "Create Account";
-    document.getElementById('authSubmitBtn').innerText = isLoggingIn ? "Login" : "Sign Up";
-    document.getElementById('toggleAuth').innerText = isLoggingIn ? "Sign Up" : "Login";
-});
-
-// Handle Auth Submission
-document.getElementById('authForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const email = document.getElementById('authEmail').value;
-    const password = document.getElementById('authPassword').value;
-    const btn = document.getElementById('authSubmitBtn');
-
-    btn.disabled = true;
-    btn.innerText = "Connecting...";
-
-    if (isLoggingIn) {
-        auth.signInWithEmailAndPassword(email, password)
-            .then((user) => {
-                window.closeAuthModal();
-                window.showSuccess("Signed in successfully!");
-            })
-            .catch((err) => {
-                alert(err.message);
-                btn.disabled = false;
-                btn.innerText = "Login";
-            });
-    } else {
-        auth.createUserWithEmailAndPassword(email, password)
-            .then(() => {
-                window.closeAuthModal();
-                window.showSuccess("Account Created!");
-            })
-            .catch((err) => {
-                alert(err.message);
-                btn.disabled = false;
-                btn.innerText = "Sign Up";
-            });
-    }
-});
