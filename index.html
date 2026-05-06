@@ -1,86 +1,89 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CampusMart | UENR Student Hub</title>
+    <title>CampusMart | UENR</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <header>
-        <nav class="top-nav">
-            <div class="logo">Campus<span>Mart</span></div>
-            <ul>
-                <li><a href="javascript:void(0)" onclick="showPage('home-page')">Home</a></li>
-                <li><a href="javascript:void(0)" onclick="showPage('sell-page')">Sell Item</a></li>
-                <li><a href="javascript:void(0)" onclick="showPage('categories-page')">Categories</a></li>
-            </ul>
-        </nav>
+    <header class="main-header">
+        <div class="header-top">
+            <h1 class="brand-logo">Campus<span>Mart</span></h1>
+        </div>
+        <div class="search-container">
+            <span class="material-symbols-outlined">search</span>
+            <input type="text" id="searchInput" placeholder="Search textbooks, electronics...">
+        </div>
     </header>
 
-    <main>
+    <main id="main-content">
         <section id="home-page">
-            <div class="hero">
-                <h1>Campus Essentials, Simplified.</h1>
-                <p>Buy and sell items within the UENR community instantly.</p>
-            </div>
+            <div class="promo-banner">🚀 UENR Student Marketplace</div>
             <div class="content-padding">
-                <h2>✨ New Listings on Campus</h2>
-                <div class="product-grid" id="listings">
-                    </div>
-            </div>
-        </section>
-
-        <section id="sell-page" style="display: none;">
-            <div class="content-padding">
-                <h2>Turn Your Gear into Cash</h2>
-                <form id="postItemForm" class="post-form">
-                    <div class="form-group">
-                        <label>Item Name</label>
-                        <input type="text" id="itemName" placeholder="e.g. iPhone 12" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Category</label>
-                        <select id="itemCategory">
-                            <option value="Electronics">Electronics</option>
-                            <option value="Hostel Essentials">Hostel Essentials</option>
-                            <option value="Academic Gear">Academic Gear</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Price (GHS)</label>
-                        <input type="number" id="itemPrice" placeholder="0.00" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Product Details / Specs</label>
-                        <textarea id="itemDescription" placeholder="e.g. 128GB, Battery 90%" rows="4"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Your WhatsApp Number</label>
-                        <input type="tel" id="sellerPhone" placeholder="054XXXXXXX" required>
-                    </div>
-                    <button type="submit" class="submit-btn">List Item Now</button>
-                </form>
+                <h2 class="section-title">New Listings</h2>
+                <div class="product-grid" id="listings"></div>
             </div>
         </section>
 
         <section id="categories-page" style="display: none;">
             <div class="content-padding">
-                <h2>Browse by Category</h2>
-                <div class="category-stack">
-                    <button class="cat-btn" onclick="filterCategory('Electronics')">📱 Electronics</button>
-                    <button class="cat-btn" onclick="filterCategory('Hostel Essentials')">🛌 Hostel Essentials</button>
-                    <button class="cat-btn" onclick="filterCategory('Academic Gear')">📚 Academic Gear</button>
+                <h2 class="section-title">Browse Categories</h2>
+                <div class="cat-grid">
+                    <div class="cat-card" onclick="filterCat('Electronics')"><span class="material-symbols-outlined">devices</span><p>Electronics</p></div>
+                    <div class="cat-card" onclick="filterCat('Academic')"><span class="material-symbols-outlined">menu_book</span><p>Academic</p></div>
+                    <div class="cat-card" onclick="filterCat('Hostel')"><span class="material-symbols-outlined">bed</span><p>Hostel</p></div>
                 </div>
+            </div>
+        </section>
+
+        <section id="sell-page" style="display: none;">
+            <div class="content-padding">
+                <h2 class="section-title">Sell an Item</h2>
+                <form id="postItemForm" class="pro-form">
+                    <input type="text" id="itemName" placeholder="Item Name" required>
+                    <select id="itemCategory">
+                        <option value="Electronics">Electronics</option>
+                        <option value="Academic">Academic</option>
+                        <option value="Hostel">Hostel Gear</option>
+                    </select>
+                    <input type="number" id="itemPrice" placeholder="Price (GHS)" required>
+                    <textarea id="itemDescription" placeholder="Specs (e.g. iPhone 12, 128GB, 90% BH)" rows="5"></textarea>
+                    <input type="tel" id="sellerPhone" placeholder="WhatsApp Number" required>
+                    <button type="submit" class="submit-btn">POST NOW</button>
+                </form>
+            </div>
+        </section>
+
+        <section id="ads-page" style="display: none;">
+            <div class="content-padding">
+                <h2 class="section-title">My Listings</h2>
+                <div id="userListings" class="product-grid">
+                    <p class="empty-msg">You haven't posted any items yet.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="account-page" style="display: none;">
+            <div class="profile-card">
+                <div class="avatar">I</div>
+                <h3>Ishak</h3>
+                <p>UENR Student Vendor</p>
+            </div>
+            <div class="settings-list">
+                <div class="setting-item"><span>Dark Mode</span><button class="toggle-btn">OFF</button></div>
+                <div class="setting-item"><span>Help & Support</span><span class="material-symbols-outlined">chevron_right</span></div>
+                <div class="setting-item logout"><span>Logout</span><span class="material-symbols-outlined">logout</span></div>
             </div>
         </section>
     </main>
 
     <div id="detailsModal" class="modal">
         <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('detailsModal')">&times;</span>
-            <div id="modalDetailsBody"></div>
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div id="modalBody"></div>
         </div>
     </div>
 
@@ -101,9 +104,11 @@
     <script src="script.js"></script>
 
     <nav class="bottom-nav">
-        <a href="javascript:void(0)" onclick="showPage('home-page')" class="nav-item"><span>🏠</span><p>Home</p></a>
-        <a href="javascript:void(0)" onclick="showPage('sell-page')" class="nav-item"><span>➕</span><p>Sell</p></a>
-        <a href="javascript:void(0)" onclick="showPage('categories-page')" class="nav-item"><span>📁</span><p>Categories</p></a>
+        <div class="nav-item active" onclick="showPage('home-page', this)"><span class="material-symbols-outlined">home</span><p>Home</p></div>
+        <div class="nav-item" onclick="showPage('categories-page', this)"><span class="material-symbols-outlined">grid_view</span><p>Cats</p></div>
+        <div class="nav-item sell-btn" onclick="showPage('sell-page', this)"><span class="material-symbols-outlined">add_circle</span><p>Sell</p></div>
+        <div class="nav-item" onclick="showPage('ads-page', this)"><span class="material-symbols-outlined">inventory_2</span><p>My Ads</p></div>
+        <div class="nav-item" onclick="showPage('account-page', this)"><span class="material-symbols-outlined">person</span><p>Account</p></div>
     </nav>
 </body>
 </html>

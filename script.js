@@ -1,96 +1,75 @@
-// --- 1. REAL-TIME LISTENER ---
-db.collection("listings").orderBy("createdAt", "desc")
-    .onSnapshot((snapshot) => {
-        const listingsContainer = document.getElementById('listings');
-        if (!listingsContainer) return; 
-
-        listingsContainer.innerHTML = ""; 
-
-        snapshot.forEach((doc) => {
-            const item = doc.data();
-            const sellerPhone = item.phone || "";
-            const itemName = item.name || "Unnamed Item";
-            const itemPrice = item.price || "0";
-            const itemCategory = item.category || "General";
-            
-            // DATA BACKUP: Checks 'description' or 'specs' so old items aren't blank
-            const itemDetails = item.description || item.specs || "No specific details provided.";
-
-            let emoji = "📦"; 
-            if (itemCategory === "Hostel Essentials") emoji = "🛌";
-            if (itemCategory === "Academic Gear") emoji = "📚";
-            if (itemCategory === "Electronics") emoji = "🔌";
-
-            const safeDesc = itemDetails.replace(/'/g, "\\'");
-
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.innerHTML = `
-                <div class="product-img">${emoji}</div> 
-                <div class="card-content">
-                    <div class="info-group">
-                        <h3>${itemName}</h3>
-                        <p class="category">${itemCategory}</p>
-                    </div>
-                    <p class="price">GHS ${itemPrice}</p>
-                    <button onclick="openDetails('${itemName}', '${itemPrice}', '${safeDesc}', '${sellerPhone}')" class="buy-btn">View</button>
-                </div>
-            `;
-            listingsContainer.appendChild(card);
-        });
-    });
-
-// --- 2. NAVIGATION LOGIC ---
-function showPage(pageId) {
-    const pages = ['home-page', 'sell-page', 'categories-page'];
-    pages.forEach(id => {
-        document.getElementById(id).style.display = 'none';
-    });
+// PAGE NAVIGATION
+function showPage(pageId, element) {
+    document.querySelectorAll('section').forEach(s => s.style.display = 'none');
     document.getElementById(pageId).style.display = 'block';
+    
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    element.classList.add('active');
     window.scrollTo(0,0);
 }
 
-// --- 3. MODAL LOGIC ---
-function openDetails(name, price, details, phone) {
-    const body = document.getElementById('modalDetailsBody');
-    body.innerHTML = `
-        <h2 style="color:#2e7d32;">${name}</h2>
-        <p style="font-weight:bold; color:#ffa000; margin: 10px 0;">GHS ${price}</p>
-        <div style="background:#f9f9f9; padding:15px; border-radius:10px; margin-bottom:20px;">
-            <strong>Details:</strong>
-            <p style="font-size:0.9rem; color:#666; margin-top:5px;">${details}</p>
+// REAL-TIME FETCHING
+db.collection("listings").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
+    const list = document.getElementById('listings');
+    list.innerHTML = "";
+    snapshot.forEach((doc) => {
+        const item = doc.data();
+        const rawDesc = item.description || item.specs || "No specific details provided.";
+        const safeDesc = encodeURIComponent(rawDesc); // FIX: Prevents breaking on special characters
+
+        list.innerHTML += `
+            <div class="card">
+                <div class="card-img">📦</div>
+                <div class="card-info">
+                    <h3>${item.name}</h3>
+                    <p style="font-size:0.8rem; color:#888;">${item.category}</p>
+                    <div class="card-price">GHS ${item.price}</div>
+                </div>
+                <button class="view-btn" onclick="openDetails('${item.name}', '${item.price}', '${safeDesc}', '${item.phone}')">View</button>
+            </div>
+        `;
+    });
+});
+
+// VIEW MODAL LOGIC
+function openDetails(name, price, desc, phone) {
+    const decodedDesc = decodeURIComponent(desc); // FIX: Safely handles your iPhone specs
+    const modalBody = document.getElementById('modalBody');
+    modalBody.innerHTML = `
+        <h2 style="color:var(--primary);">${name}</h2>
+        <h3 style="color:var(--accent); margin:10px 0;">GHS ${price}</h3>
+        <div style="background:#f4f4f4; padding:15px; border-radius:8px; margin:15px 0;">
+            <strong>Product Details:</strong><br>
+            <p style="margin-top:5px; font-size:0.9rem; line-height:1.4;">${decodedDesc}</p>
         </div>
-        <a href="https://wa.me/${phone}" target="_blank" class="submit-btn" style="display:block; text-align:center; text-decoration:none;">Chat on WhatsApp</a>
+        <a href="https://wa.me/${phone}" style="display:block; background:#25d366; color:white; text-align:center; padding:15px; border-radius:8px; text-decoration:none; font-weight:bold;">CHAT ON WHATSAPP</a>
     `;
     document.getElementById('detailsModal').style.display = 'flex';
 }
 
-function closeModal(id) {
-    document.getElementById(id).style.display = 'none';
+function closeModal() {
+    document.getElementById('detailsModal').style.display = 'none';
 }
 
-// --- 4. SELL FORM LOGIC ---
+// SELL FORM SUBMISSION
 document.getElementById('postItemForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const btn = this.querySelector('button');
-    btn.disabled = true;
     btn.innerText = "Posting...";
-
-    let phone = document.getElementById('sellerPhone').value.replace(/\D/g, ''); 
-    if (phone.startsWith('0')) phone = '233' + phone.substring(1);
+    btn.disabled = true;
 
     db.collection("listings").add({
         name: document.getElementById('itemName').value,
-        price: document.getElementById('itemPrice').value,
         category: document.getElementById('itemCategory').value,
+        price: document.getElementById('itemPrice').value,
         description: document.getElementById('itemDescription').value,
-        phone: phone,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp() 
+        phone: document.getElementById('sellerPhone').value,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
     }).then(() => {
-        this.reset();
-        btn.disabled = false;
-        btn.innerText = "List Item Now";
-        showPage('home-page');
         alert("Listing successful!");
+        this.reset();
+        btn.innerText = "POST NOW";
+        btn.disabled = false;
+        showPage('home-page', document.querySelector('.nav-item'));
     });
 });
