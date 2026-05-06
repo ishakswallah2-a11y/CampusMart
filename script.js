@@ -12,92 +12,85 @@ db.collection("listings").orderBy("createdAt", "desc")
             const itemName = item.name || "Unnamed Item";
             const itemPrice = item.price || "0";
             const itemCategory = item.category || "General";
-            const itemDescription = item.description || "No specific details provided.";
+            
+            // DATA BACKUP: Checks 'description' or 'specs' so old items aren't blank
+            const itemDetails = item.description || item.specs || "No specific details provided.";
 
-            let categoryEmoji = "📦"; 
-            if (itemCategory === "Hostel Essentials") categoryEmoji = "🛌";
-            if (itemCategory === "Academic Gear") categoryEmoji = "📚";
-            if (itemCategory === "Electronics") categoryEmoji = "🔌";
+            let emoji = "📦"; 
+            if (itemCategory === "Hostel Essentials") emoji = "🛌";
+            if (itemCategory === "Academic Gear") emoji = "📚";
+            if (itemCategory === "Electronics") emoji = "🔌";
 
-            // Escape quotes to prevent JS errors
-            const safeName = itemName.replace(/'/g, "\\'");
-            const safeDesc = itemDescription.replace(/'/g, "\\'");
+            const safeDesc = itemDetails.replace(/'/g, "\\'");
 
-            const newCard = document.createElement('div');
-            newCard.className = 'card';
-            newCard.innerHTML = `
-                <div class="product-img">${categoryEmoji}</div> 
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <div class="product-img">${emoji}</div> 
                 <div class="card-content">
                     <div class="info-group">
                         <h3>${itemName}</h3>
                         <p class="category">${itemCategory}</p>
                     </div>
                     <p class="price">GHS ${itemPrice}</p>
-                    <button onclick="openDetails('${safeName}', '${itemPrice}', '${safeDesc}', '${sellerPhone}')" class="buy-btn">View</button>
+                    <button onclick="openDetails('${itemName}', '${itemPrice}', '${safeDesc}', '${sellerPhone}')" class="buy-btn">View</button>
                 </div>
             `;
-            listingsContainer.appendChild(newCard);
+            listingsContainer.appendChild(card);
         });
     });
 
 // --- 2. NAVIGATION LOGIC ---
 function showPage(pageId) {
-    const pages = ['home-page', 'sell-page', 'account-page', 'categories-page'];
+    const pages = ['home-page', 'sell-page', 'categories-page'];
     pages.forEach(id => {
-        const element = document.getElementById(id);
-        if (element) element.style.display = 'none';
+        document.getElementById(id).style.display = 'none';
     });
-    
     document.getElementById(pageId).style.display = 'block';
     window.scrollTo(0,0);
 }
 
-// --- 3. MODAL FUNCTIONS ---
-function openDetails(name, price, specs, phone) {
-    const modal = document.getElementById('detailsModal');
+// --- 3. MODAL LOGIC ---
+function openDetails(name, price, details, phone) {
     const body = document.getElementById('modalDetailsBody');
-    
     body.innerHTML = `
         <h2 style="color:#2e7d32;">${name}</h2>
-        <p style="font-weight:bold; color:#ffa000; font-size:1.2rem;">GHS ${price}</p>
-        <div style="background:#f4f7f6; padding:15px; border-radius:10px; margin:15px 0;">
+        <p style="font-weight:bold; color:#ffa000; margin: 10px 0;">GHS ${price}</p>
+        <div style="background:#f9f9f9; padding:15px; border-radius:10px; margin-bottom:20px;">
             <strong>Details:</strong>
-            <p style="color:#555; font-size:0.9rem;">${specs}</p>
+            <p style="font-size:0.9rem; color:#666; margin-top:5px;">${details}</p>
         </div>
-        <a href="https://wa.me/${phone}" target="_blank" class="submit-btn" style="display:block; text-align:center; text-decoration:none; background:#2e7d32;">Chat on WhatsApp</a>
+        <a href="https://wa.me/${phone}" target="_blank" class="submit-btn" style="display:block; text-align:center; text-decoration:none;">Chat on WhatsApp</a>
     `;
-    modal.style.display = 'flex';
+    document.getElementById('detailsModal').style.display = 'flex';
 }
 
 function closeModal(id) {
     document.getElementById(id).style.display = 'none';
 }
 
-// --- 4. SELL FORM ---
-const postForm = document.getElementById('postItemForm');
-if (postForm) {
-    postForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const btn = this.querySelector('button');
-        btn.disabled = true;
-        btn.innerText = "Posting...";
+// --- 4. SELL FORM LOGIC ---
+document.getElementById('postItemForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const btn = this.querySelector('button');
+    btn.disabled = true;
+    btn.innerText = "Posting...";
 
-        let phone = document.getElementById('sellerPhone').value.replace(/\D/g, ''); 
-        if (phone.startsWith('0')) phone = '233' + phone.substring(1);
+    let phone = document.getElementById('sellerPhone').value.replace(/\D/g, ''); 
+    if (phone.startsWith('0')) phone = '233' + phone.substring(1);
 
-        db.collection("listings").add({
-            name: document.getElementById('itemName').value,
-            price: document.getElementById('itemPrice').value,
-            category: document.getElementById('itemCategory').value,
-            description: document.getElementById('itemDescription').value,
-            phone: phone,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp() 
-        }).then(() => {
-            this.reset();
-            btn.disabled = false;
-            btn.innerText = "List Item Now";
-            showPage('home-page');
-            alert("Listed Successfully!");
-        });
+    db.collection("listings").add({
+        name: document.getElementById('itemName').value,
+        price: document.getElementById('itemPrice').value,
+        category: document.getElementById('itemCategory').value,
+        description: document.getElementById('itemDescription').value,
+        phone: phone,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp() 
+    }).then(() => {
+        this.reset();
+        btn.disabled = false;
+        btn.innerText = "List Item Now";
+        showPage('home-page');
+        alert("Listing successful!");
     });
-}
+});

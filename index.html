@@ -20,7 +20,6 @@
     </header>
 
     <main>
-        <!-- 1. HOME PAGE -->
         <section id="home-page">
             <div class="hero">
                 <h1>Campus Essentials, Simplified.</h1>
@@ -29,19 +28,17 @@
             <div class="content-padding">
                 <h2>✨ New Listings on Campus</h2>
                 <div class="product-grid" id="listings">
-                    <!-- Listings load here -->
-                </div>
+                    </div>
             </div>
         </section>
 
-        <!-- 2. SELL PAGE -->
         <section id="sell-page" style="display: none;">
             <div class="content-padding">
                 <h2>Turn Your Gear into Cash</h2>
                 <form id="postItemForm" class="post-form">
                     <div class="form-group">
                         <label>Item Name</label>
-                        <input type="text" id="itemName" placeholder="e.g. iPhone 11" required>
+                        <input type="text" id="itemName" placeholder="e.g. iPhone 12" required>
                     </div>
                     <div class="form-group">
                         <label>Category</label>
@@ -57,7 +54,7 @@
                     </div>
                     <div class="form-group">
                         <label>Product Details / Specs</label>
-                        <textarea id="itemDescription" placeholder="e.g. 128GB, Battery 85%" rows="4" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;"></textarea>
+                        <textarea id="itemDescription" placeholder="e.g. 128GB, Battery 90%" rows="4"></textarea>
                     </div>
                     <div class="form-group">
                         <label>Your WhatsApp Number</label>
@@ -68,39 +65,25 @@
             </div>
         </section>
 
-        <!-- 3. CATEGORIES PAGE (The New Update) -->
         <section id="categories-page" style="display: none;">
             <div class="content-padding">
                 <h2>Browse by Category</h2>
-                <div class="category-list" style="display: grid; gap: 10px; margin-top: 20px;">
-                    <button class="submit-btn" style="background: #2e7d32;" onclick="alert('Filtering coming soon!')">📱 Electronics</button>
-                    <button class="submit-btn" style="background: #2e7d32;" onclick="alert('Filtering coming soon!')">🛌 Hostel Essentials</button>
-                    <button class="submit-btn" style="background: #2e7d32;" onclick="alert('Filtering coming soon!')">📚 Academic Gear</button>
+                <div class="category-stack">
+                    <button class="cat-btn" onclick="filterCategory('Electronics')">📱 Electronics</button>
+                    <button class="cat-btn" onclick="filterCategory('Hostel Essentials')">🛌 Hostel Essentials</button>
+                    <button class="cat-btn" onclick="filterCategory('Academic Gear')">📚 Academic Gear</button>
                 </div>
-            </div>
-        </section>
-
-        <!-- 4. ACCOUNT PAGE -->
-        <section id="account-page" style="display: none;">
-            <div class="content-padding" style="text-align: center;">
-                <h2>My Account</h2>
-                <p>Welcome to your CampusMart profile.</p>
-                <button class="submit-btn" style="background: #2e7d32; margin-top: 20px;">Contact Admin Support</button>
             </div>
         </section>
     </main>
 
-    <!-- PRODUCT DETAILS MODAL -->
     <div id="detailsModal" class="modal">
         <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('detailsModal')" style="float:right; cursor:pointer; font-size: 24px;">&times;</span>
-            <div id="modalDetailsBody">
-                <!-- Data injected here -->
-            </div>
+            <span class="close-btn" onclick="closeModal('detailsModal')">&times;</span>
+            <div id="modalDetailsBody"></div>
         </div>
     </div>
 
-    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script>
@@ -117,11 +100,10 @@
     </script>
     <script src="script.js"></script>
 
-    <!-- BOTTOM NAV -->
     <nav class="bottom-nav">
         <a href="javascript:void(0)" onclick="showPage('home-page')" class="nav-item"><span>🏠</span><p>Home</p></a>
         <a href="javascript:void(0)" onclick="showPage('sell-page')" class="nav-item"><span>➕</span><p>Sell</p></a>
-        <a href="javascript:void(0)" onclick="showPage('account-page')" class="nav-item"><span>👤</span><p>Account</p></a>
+        <a href="javascript:void(0)" onclick="showPage('categories-page')" class="nav-item"><span>📁</span><p>Categories</p></a>
     </nav>
 </body>
 </html>
