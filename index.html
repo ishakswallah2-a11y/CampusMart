@@ -12,81 +12,82 @@
     <header class="main-header">
         <div class="header-top">
             <h1 class="brand-logo">Campus<span>Mart</span></h1>
-            <div class="notification-wrapper">
-                <span class="material-symbols-outlined notification-bell">notifications</span>
-                <span class="notification-badge">2</span> </div>
+            <div class="noti-wrapper">
+                <span class="material-symbols-outlined">notifications</span>
+                <div id="noti-count" class="noti-badge" style="display:none;">0</div>
+            </div>
         </div>
-        <div class="search-bar-container">
-            <span class="material-symbols-outlined search-icon">search</span>
-            <input type="text" id="searchInput" placeholder="Search textbooks, iPhones, rooms...">
+        <div class="search-container">
+            <span class="material-symbols-outlined">search</span>
+            <input type="text" id="searchInput" placeholder="Search UENR Market...">
         </div>
     </header>
 
-    <main id="main-content">
+    <main id="app-content">
         <section id="home-page" class="page">
-            <div class="promo-banner">🔥 Hot Deals in UENR</div>
-            <div class="content-padding">
-                <h2 class="section-title">Latest Listings</h2>
+            <div class="promo-banner">🚀 Student Deals @ UENR</div>
+            <div class="container">
+                <h2 class="section-title">Fresh Listings</h2>
                 <div id="listings" class="product-grid"></div>
             </div>
         </section>
 
-        <section id="categories-page" class="page" style="display: none;">
-            <div class="content-padding">
-                <h2 class="section-title">Categories</h2>
-                <div class="cat-grid">
-                    <div class="cat-card" onclick="filterCat('Electronics')"><span class="material-symbols-outlined">devices</span><p>Tech</p></div>
-                    <div class="cat-card" onclick="filterCat('Academic')"><span class="material-symbols-outlined">menu_book</span><p>Books</p></div>
-                    <div class="cat-card" onclick="filterCat('Hostel')"><span class="material-symbols-outlined">bed</span><p>Hostel</p></div>
-                </div>
-            </div>
-        </section>
-
-        <section id="sell-page" class="page" style="display: none;">
-            <div class="content-padding">
-                <h2 class="section-title">Sell Your Gear</h2>
+        <section id="sell-page" class="page" style="display:none;">
+            <div class="container">
+                <h2 class="section-title">Sell Your Item</h2>
                 <form id="postItemForm" class="pro-form">
+                    <div class="upload-container" onclick="document.getElementById('itemImage').click()">
+                        <span class="material-symbols-outlined">add_a_photo</span>
+                        <p id="upload-text">Tap to upload item photo</p>
+                        <input type="file" id="itemImage" accept="image/*" style="display:none;">
+                        <img id="imagePreview" src="" style="display:none; width:100%; border-radius:12px;">
+                    </div>
                     <input type="text" id="itemName" placeholder="What are you selling?" required>
-                    <select id="itemCategory">
-                        <option value="Electronics">Electronics</option>
-                        <option value="Academic">Academic / Books</option>
-                        <option value="Hostel">Hostel Essentials</option>
-                    </select>
                     <input type="number" id="itemPrice" placeholder="Price (GHS)" required>
-                    <textarea id="itemDescription" placeholder="Specs (e.g. 128GB, 85% Health)" rows="4"></textarea>
-                    <input type="tel" id="sellerPhone" placeholder="WhatsApp Number" required>
-                    <button type="submit" class="submit-btn">LIST ITEM NOW</button>
+                    <textarea id="itemDescription" placeholder="Provide details (e.g. iPhone 12, 128GB, 90% Battery)" rows="5"></textarea>
+                    <input type="tel" id="sellerPhone" placeholder="WhatsApp Number (054...)" required>
+                    <button type="submit" id="submitBtn" class="primary-btn">POST LISTING</button>
                 </form>
             </div>
         </section>
 
-        <section id="account-page" class="page" style="display: none;">
+        <section id="cat-page" class="page" style="display:none;">
+            <div class="container">
+                <h2 class="section-title">Categories</h2>
+                <div class="category-grid">
+                    <div class="cat-card"><span class="material-symbols-outlined">devices</span><p>Tech</p></div>
+                    <div class="cat-card"><span class="material-symbols-outlined">menu_book</span><p>Books</p></div>
+                    <div class="cat-card"><span class="material-symbols-outlined">bed</span><p>Hostel</p></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="ads-page" class="page" style="display:none;">
+            <div class="container">
+                <h2 class="section-title">My Ads</h2>
+                <p style="text-align:center; color:#888;">Coming soon: Manage your active sales.</p>
+            </div>
+        </section>
+
+        <section id="account-page" class="page" style="display:none;">
             <div class="profile-card">
                 <div class="avatar">I</div>
                 <h3>Ishak</h3>
-                <p>UENR Verified Student</p>
-            </div>
-            <div class="settings-group">
-                <div class="setting-row">
-                    <p>Dark Mode</p>
-                    <label class="switch">
-                        <input type="checkbox" id="darkModeToggle" onclick="toggleDarkMode()">
-                        <span class="slider round"></span>
-                    </label>
-                </div>
+                <p>UENR Computer Science Student</p>
             </div>
         </section>
     </main>
 
-    <div id="detailsModal" class="modal-overlay">
+    <div id="viewModal" class="modal-overlay">
         <div class="modal-box">
-            <span class="close-modal" onclick="closeModal()">&times;</span>
-            <div id="modalContent"></div>
+            <span class="close-x" onclick="closeModal()">&times;</span>
+            <div id="modalBody"></div>
         </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
     <script>
       const firebaseConfig = {
         apiKey: "AIzaSyDWcC4KAKKsiKWKSbn2yJiDHpLXZm1Ywk",
@@ -98,26 +99,16 @@
       };
       firebase.initializeApp(firebaseConfig);
       const db = firebase.firestore();
+      const storage = firebase.storage();
     </script>
     <script src="script.js"></script>
 
     <nav class="bottom-nav">
-        <div class="nav-btn active" onclick="showPage('home-page', this)">
-            <span class="material-symbols-outlined">home</span>
-            <span class="nav-label">Home</span>
-        </div>
-        <div class="nav-btn" onclick="showPage('categories-page', this)">
-            <span class="material-symbols-outlined">grid_view</span>
-            <span class="nav-label">Shop</span>
-        </div>
-        <div class="nav-btn sell-action" onclick="showPage('sell-page', this)">
-            <span class="material-symbols-outlined">add_circle</span>
-            <span class="nav-label">Sell</span>
-        </div>
-        <div class="nav-btn" onclick="showPage('account-page', this)">
-            <span class="material-symbols-outlined">person</span>
-            <span class="nav-label">Account</span>
-        </div>
+        <div class="nav-tab active" onclick="showPage('home-page', this)"><span class="material-symbols-outlined">home</span><p>Home</p></div>
+        <div class="nav-tab" onclick="showPage('cat-page', this)"><span class="material-symbols-outlined">grid_view</span><p>Category</p></div>
+        <div class="nav-tab sell-btn" onclick="showPage('sell-page', this)"><span class="material-symbols-outlined">add_circle</span><p>Sell</p></div>
+        <div class="nav-tab" onclick="showPage('ads-page', this)"><span class="material-symbols-outlined">inventory_2</span><p>Ads</p></div>
+        <div class="nav-tab" onclick="showPage('account-page', this)"><span class="material-symbols-outlined">person</span><p>Account</p></div>
     </nav>
 </body>
 </html>

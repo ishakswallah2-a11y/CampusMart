@@ -1,85 +1,108 @@
-// NAVIGATION LOGIC
-function showPage(pageId, element) {
+// PAGE NAVIGATION
+function showPage(pageId, el) {
     document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
     document.getElementById(pageId).style.display = 'block';
-    
-    document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-    element.classList.add('active');
+    document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+    el.classList.add('active');
     window.scrollTo(0,0);
 }
 
-// REAL-TIME LISTINGS FETCH
+// IMAGE PREVIEW BEFORE UPLOAD
+document.getElementById('itemImage').onchange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+            const preview = document.getElementById('imagePreview');
+            preview.src = reader.result;
+            preview.style.display = "block";
+            document.getElementById('upload-text').style.display = "none";
+            document.querySelector('.upload-container span').style.display = "none";
+        };
+        reader.readAsDataURL(file);
+    }
+};
+
+// FETCH LISTINGS (AliExpress Grid)
 db.collection("listings").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
-    const list = document.getElementById('listings');
-    list.innerHTML = "";
+    const listingsDiv = document.getElementById('listings');
+    listingsDiv.innerHTML = "";
     snapshot.forEach((doc) => {
         const item = doc.data();
-        const docId = doc.id; // Get the unique ID for each item
-        
-        list.innerHTML += `
-            <div class="card">
-                <div class="card-info">
-                    <h3 style="font-size: 1.1rem;">${item.name}</h3>
+        const id = doc.id;
+        listingsDiv.innerHTML += `
+            <div class="card" onclick="openDetails('${id}')">
+                <img src="${item.imageUrl || 'https://via.placeholder.com/150'}" class="card-img">
+                <div class="card-content">
+                    <p style="font-size:0.9rem; color:#444; height:38px; overflow:hidden;">${item.name}</p>
                     <div class="card-price">GHS ${item.price}</div>
-                    <p style="font-size: 0.8rem; color: #888;">${item.category}</p>
                 </div>
-                <button class="view-btn" onclick="openDetails('${docId}')">View</button>
             </div>
         `;
     });
 });
 
-// THE FIXED VIEW LOGIC
+// SUBMIT WITH IMAGE UPLOAD
+document.getElementById('postItemForm').onsubmit = async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    const imageFile = document.getElementById('itemImage').files[0];
+    
+    if (!imageFile) return alert("Please select a photo of your item!");
+
+    btn.innerText = "⏳ Uploading to Campus...";
+    btn.disabled = true;
+
+    try {
+        // 1. Upload to Firebase Storage
+        const storageRef = storage.ref(`campus_items/${Date.now()}_${imageFile.name}`);
+        const snapshot = await storageRef.put(imageFile);
+        const downloadURL = await snapshot.ref.getDownloadURL();
+
+        // 2. Save Data to Firestore
+        await db.collection("listings").add({
+            name: document.getElementById('itemName').value,
+            price: document.getElementById('itemPrice').value,
+            description: document.getElementById('itemDescription').value,
+            phone: document.getElementById('sellerPhone').value,
+            imageUrl: downloadURL,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        alert("Post successful! It's now live at UENR.");
+        location.reload(); 
+    } catch (err) {
+        console.error(err);
+        alert("Upload failed. Check your Firebase Storage rules.");
+        btn.disabled = false;
+        btn.innerText = "POST LISTING";
+    }
+};
+
+// FIXED MODAL VIEW
 function openDetails(docId) {
     db.collection("listings").doc(docId).get().then((doc) => {
         if (doc.exists) {
             const data = doc.data();
-            const modalContent = document.getElementById('modalContent');
-            
-            modalContent.innerHTML = `
-                <h2 style="color:var(--primary); margin-bottom:10px;">${data.name}</h2>
-                <h3 style="color:var(--accent); margin-bottom:15px;">GHS ${data.price}</h3>
-                
-                <div style="background:#f9f9f9; padding:15px; border-radius:10px; margin-bottom:20px;">
-                    <strong style="display:block; margin-bottom:5px;">Product Details:</strong>
-                    <p style="font-size:0.95rem; line-height:1.5; color:#555;">
-                        ${data.description || "No specific details provided for this item."}
-                    </p>
+            const modalBody = document.getElementById('modalBody');
+            modalBody.innerHTML = `
+                <img src="${data.imageUrl}" style="width:100%; border-radius:15px; margin-bottom:20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                <h2 style="color:var(--primary);">${data.name}</h2>
+                <h3 style="color:var(--accent); margin:10px 0;">GHS ${data.price}</h3>
+                <div style="background:#f9f9f9; padding:20px; border-radius:12px; margin-top:15px;">
+                    <strong>Seller Details:</strong>
+                    <p style="margin-top:8px; line-height:1.6; color:#555;">${data.description}</p>
                 </div>
-
                 <a href="https://wa.me/${data.phone}" target="_blank" 
-                   style="display:block; background:#25d366; color:white; text-align:center; padding:16px; border-radius:12px; text-decoration:none; font-weight:bold; font-size:1.1rem;">
+                   style="display:block; background:#25d366; color:white; text-align:center; padding:18px; border-radius:15px; margin-top:25px; text-decoration:none; font-weight:bold; font-size:1.1rem;">
                    CHAT WITH SELLER
                 </a>
             `;
-            document.getElementById('detailsModal').style.display = 'flex';
+            document.getElementById('viewModal').style.display = "flex";
         }
-    }).catch((error) => console.log("Error fetching details: ", error));
+    });
 }
 
 function closeModal() {
-    document.getElementById('detailsModal').style.display = 'none';
+    document.getElementById('viewModal').style.display = "none";
 }
-
-// FORM SUBMISSION (With Status Updates)
-document.getElementById('postItemForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const btn = this.querySelector('button');
-    btn.innerText = "⏳ Posting to Campus...";
-    btn.disabled = true;
-
-    db.collection("listings").add({
-        name: document.getElementById('itemName').value,
-        category: document.getElementById('itemCategory').value,
-        price: document.getElementById('itemPrice').value,
-        description: document.getElementById('itemDescription').value,
-        phone: document.getElementById('sellerPhone').value,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(() => {
-        alert("Success! Your item is now live at UENR.");
-        this.reset();
-        btn.innerText = "LIST ITEM NOW";
-        btn.disabled = false;
-        showPage('home-page', document.querySelector('.nav-btn'));
-    });
-});
