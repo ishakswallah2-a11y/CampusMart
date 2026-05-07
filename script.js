@@ -1,16 +1,37 @@
-// --- SPLASH SCREEN LOGIC ---
+// --- 1. FIREBASE CONFIGURATION ---
+const firebaseConfig = {
+  apiKey: "AIzaSyDWcC4KAKKsiKWKSbn2yJiDHePlXZm1Ywk",
+  authDomain: "campusmart-5c975.firebaseapp.com",
+  projectId: "campusmart-5c975",
+  storageBucket: "campusmart-5c975.firebasestorage.app",
+  messagingSenderId: "184864282111",
+  appId: "1:184864282111:web:3a0e0c9a7bafa68fea03ca"
+};
+
+// --- 2. INITIALIZE FIREBASE ---
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+
+// Global shortcuts
+const auth = firebase.auth();
+const db = firebase.firestore();
+const storage = firebase.storage();
+
+// --- 3. SPLASH SCREEN LOGIC ---
 window.addEventListener('load', () => {
     const splash = document.getElementById('splash-screen');
-    
-    // Show splash for 3 seconds, then hide smoothly
-    setTimeout(() => {
-        splash.classList.add('fade-out');
-    }, 3000); 
+    if (splash) {
+        // Show splash for 3 seconds, then hide smoothly
+        setTimeout(() => {
+            splash.classList.add('fade-out');
+        }, 3000); 
+    }
 });
 
-// --- NAVIGATION LOGIC ---
+// --- 4. NAVIGATION LOGIC ---
 function showPage(pageId, el) {
-    const user = firebase.auth().currentUser;
+    const user = auth.currentUser;
 
     // SELLER GATE: Must login to sell
     if (pageId === 'sell-page' && !user) {
@@ -20,13 +41,14 @@ function showPage(pageId, el) {
 
     // Hide all pages and show the selected one
     document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
-    document.getElementById(pageId).style.display = 'block';
+    const targetPage = document.getElementById(pageId);
+    if (targetPage) targetPage.style.display = 'block';
     
     // Update active tab styling
     document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
     if(el) el.classList.add('active');
 
-    // Header Bell Logic: Hide notification bell on account page
+    // Header Bell Logic
     const globalBell = document.getElementById('main-noti');
     if (globalBell) {
         globalBell.style.display = (pageId === 'account-page') ? 'none' : 'block';
@@ -35,7 +57,7 @@ function showPage(pageId, el) {
     window.scrollTo(0,0);
 }
 
-// --- AUTH LOGIC ---
+// --- 5. AUTH LOGIC ---
 let isLoginMode = false;
 function toggleAuthMode() {
     isLoginMode = !isLoginMode;
@@ -57,9 +79,9 @@ async function handleAuth() {
 
     try {
         if (isLoginMode) {
-            await firebase.auth().signInWithEmailAndPassword(email, pass);
+            await auth.signInWithEmailAndPassword(email, pass);
         } else {
-            const res = await firebase.auth().createUserWithEmailAndPassword(email, pass);
+            const res = await auth.createUserWithEmailAndPassword(email, pass);
             await res.user.updateProfile({ displayName: name });
         }
         closeAuth();
@@ -71,21 +93,25 @@ async function handleAuth() {
     }
 }
 
-// Listen for Auth State Changes
-firebase.auth().onAuthStateChanged(user => {
+// Global Auth State Observer
+auth.onAuthStateChanged(user => {
+    const nameLabel = document.getElementById('user-display-name');
+    const emailLabel = document.getElementById('user-display-email');
+    const initialLabel = document.getElementById('user-initial');
+
     if (user) {
-        document.getElementById('user-display-name').innerText = user.displayName || "Student";
-        document.getElementById('user-display-email').innerText = user.email;
-        document.getElementById('user-initial').innerText = user.displayName ? user.displayName[0].toUpperCase() : "U";
+        if (nameLabel) nameLabel.innerText = user.displayName || "Student";
+        if (emailLabel) emailLabel.innerText = user.email;
+        if (initialLabel) initialLabel.innerText = user.displayName ? user.displayName[0].toUpperCase() : "U";
     } else {
-        document.getElementById('user-display-name').innerText = "Guest Student";
-        document.getElementById('user-display-email').innerText = "Login to see your profile";
-        document.getElementById('user-initial').innerText = "?";
+        if (nameLabel) nameLabel.innerText = "Guest Student";
+        if (emailLabel) emailLabel.innerText = "Login to see your profile";
+        if (initialLabel) initialLabel.innerText = "?";
     }
 });
 
 function handleLogout() {
-    firebase.auth().signOut().then(() => {
+    auth.signOut().then(() => {
         alert("Logged out successfully");
         showPage('home-page', document.querySelector('.nav-tab'));
     });
@@ -94,22 +120,18 @@ function handleLogout() {
 function openAuth() { document.getElementById('auth-modal').style.display = 'flex'; }
 function closeAuth() { document.getElementById('auth-modal').style.display = 'none'; }
 
-// --- NOTIFICATION LOGIC (REAL-TIME DATA) ---
+// --- 6. LISTING & NOTIFICATION LOGIC ---
 db.collection("listings").onSnapshot(snap => {
     const badge = document.getElementById('noti-count');
-    let realCount = 0; // You can implement specific logic here to count new items
-    
-    if (realCount > 0) {
-        badge.innerText = realCount;
-        badge.style.display = "flex";
-    } else {
-        badge.style.display = "none";
-    }
+    // Logic for new item badge can be added here
+    if (badge) badge.style.display = "none"; 
 });
 
-// --- LISTING LOGIC (HOME FEED) ---
+// Home Feed Real-time listener
 db.collection("listings").orderBy("createdAt", "desc").onSnapshot(snap => {
     const container = document.getElementById('listings');
+    if (!container) return;
+    
     container.innerHTML = "";
     if (snap.empty) {
         container.innerHTML = "<p style='padding:20px; text-align:center; color:#888;'>No listings available yet.</p>";
@@ -128,13 +150,17 @@ db.collection("listings").orderBy("createdAt", "desc").onSnapshot(snap => {
     });
 });
 
-// --- CATEGORY FILTER LOGIC ---
+// --- 7. CATEGORY FILTER LOGIC ---
 function filterCategory(cat, el) {
     document.querySelectorAll('.cat-item').forEach(item => item.classList.remove('active'));
-    el.classList.add('active');
-    document.getElementById('selected-cat-name').innerText = cat;
+    if (el) el.classList.add('active');
+    
+    const catHeader = document.getElementById('selected-cat-name');
+    if (catHeader) catHeader.innerText = cat;
 
     const resultsContainer = document.getElementById('category-results');
+    if (!resultsContainer) return;
+    
     resultsContainer.innerHTML = "<p style='text-align:center; padding:20px;'>Loading...</p>";
 
     let query = db.collection("listings");
@@ -162,52 +188,53 @@ function filterCategory(cat, el) {
     });
 }
 
-// --- POSTING LOGIC (SMOOTH TRANSITION) ---
-document.getElementById('postItemForm').onsubmit = async (e) => {
-    e.preventDefault();
-    const btn = document.getElementById('submitBtn');
-    const file = document.getElementById('itemImage').files[0];
-    if (!file) return alert("Please select a photo of your item!");
-
-    btn.innerText = "⏳ UPLOADING...";
-    btn.disabled = true;
-
-    try {
-        const ref = storage.ref(`items/${Date.now()}_${file.name}`);
-        const task = await ref.put(file);
-        const url = await task.ref.getDownloadURL();
-
-        await db.collection("listings").add({
-            name: document.getElementById('itemName').value,
-            price: document.getElementById('itemPrice').value,
-            category: document.getElementById('itemCategory').value,
-            description: document.getElementById('itemDescription').value,
-            phone: document.getElementById('sellerPhone').value,
-            imageUrl: url,
-            sellerId: firebase.auth().currentUser.uid,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-
-        alert("Success! Your item is now live on CampusMart.");
+// --- 8. POSTING LOGIC ---
+const postForm = document.getElementById('postItemForm');
+if (postForm) {
+    postForm.onsubmit = async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('submitBtn');
+        const file = document.getElementById('itemImage').files[0];
         
-        // Reset the form and UI
-        document.getElementById('postItemForm').reset();
-        document.getElementById('imagePreview').style.display = "none";
-        document.getElementById('upload-text').style.display = "block";
-        
-        // Navigate back to home instead of refreshing the whole page
-        showPage('home-page', document.querySelector('.nav-tab'));
-        
-    } catch (err) {
-        console.error(err);
-        alert("Error uploading. Please try again.");
-    } finally {
-        btn.innerText = "POST AD";
-        btn.disabled = false;
-    }
-};
+        if (!file) return alert("Please select a photo of your item!");
+        if (!auth.currentUser) return alert("You must be logged in to post.");
 
-// --- UTILS & MODALS ---
+        btn.innerText = "⏳ UPLOADING...";
+        btn.disabled = true;
+
+        try {
+            const ref = storage.ref(`items/${Date.now()}_${file.name}`);
+            const task = await ref.put(file);
+            const url = await task.ref.getDownloadURL();
+
+            await db.collection("listings").add({
+                name: document.getElementById('itemName').value,
+                price: document.getElementById('itemPrice').value,
+                category: document.getElementById('itemCategory').value,
+                description: document.getElementById('itemDescription').value,
+                phone: document.getElementById('sellerPhone').value,
+                imageUrl: url,
+                sellerId: auth.currentUser.uid,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            alert("Success! Your item is now live on CampusMart.");
+            postForm.reset();
+            document.getElementById('imagePreview').style.display = "none";
+            document.getElementById('upload-text').style.display = "block";
+            showPage('home-page', document.querySelector('.nav-tab'));
+            
+        } catch (err) {
+            console.error(err);
+            alert("Error uploading. Please try again.");
+        } finally {
+            btn.innerText = "POST AD";
+            btn.disabled = false;
+        }
+    };
+}
+
+// --- 9. UTILS & MODALS ---
 function openDetails(id) {
     db.collection("listings").doc(id).get().then(doc => {
         const data = doc.data();
@@ -227,16 +254,22 @@ function openDetails(id) {
 function closeModal() { document.getElementById('viewModal').style.display = 'none'; }
 
 // Image Preview Utility
-document.getElementById('itemImage').onchange = (e) => {
-    const file = e.target.files[0];
-    if(file) {
-        const reader = new FileReader();
-        reader.onload = () => {
-            const preview = document.getElementById('imagePreview');
-            preview.src = reader.result;
-            preview.style.display = "block";
-            document.getElementById('upload-text').style.display = "none";
-        };
-        reader.readAsDataURL(file);
-    }
-};
+const imageInput = document.getElementById('itemImage');
+if (imageInput) {
+    imageInput.onchange = (e) => {
+        const file = e.target.files[0];
+        if(file) {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const preview = document.getElementById('imagePreview');
+                if (preview) {
+                    preview.src = reader.result;
+                    preview.style.display = "block";
+                }
+                const uploadText = document.getElementById('upload-text');
+                if (uploadText) uploadText.style.display = "none";
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+}
