@@ -13,125 +13,115 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 const storage = firebase.storage();
 
-let isLoginMode = false;
-
-// --- 2. SPLASH SCREEN LOGIC ---
+// --- 2. SPLASH SCREEN ---
 window.addEventListener('load', () => {
-    const progress = document.querySelector('.loading-progress');
-    const splash = document.getElementById('splash-screen');
-    if (progress) progress.style.width = '100%';
+    document.querySelector('.loading-progress').style.width = '100%';
     setTimeout(() => {
-        if (splash) {
-            splash.classList.add('fade-out');
-            setTimeout(() => { splash.style.display = 'none'; }, 800);
-        }
-    }, 3000);
+        const splash = document.getElementById('splash-screen');
+        splash.classList.add('fade-out');
+        setTimeout(() => { splash.style.display = 'none'; }, 800);
+    }, 2800);
 });
 
-// --- 3. NAVIGATION (FIXED FOR SELL BUTTON) ---
+// --- 3. NAVIGATION ---
 function showPage(pageId, el) {
     const user = auth.currentUser;
-    // If user tries to sell without login, show the Join box
-    if (pageId === 'sell-page' && !user) {
+    // Protect Sell and Account
+    if ((pageId === 'sell-page' || pageId === 'account-page') && !user) {
         document.getElementById('auth-modal').style.display = 'flex';
         return;
     }
-    document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
-    const target = document.getElementById(pageId);
-    if (target) target.style.display = 'block';
     
-    document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
-    if (el) el.classList.add('active');
-    window.scrollTo(0,0);
+    document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+    document.getElementById(pageId).style.display = 'block';
+    
+    if (el) {
+        document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+        el.classList.add('active');
+    }
 }
 
-// --- 4. AUTH LOGIC (FIXED EMAIL FORMATTING) ---
+// --- 4. CATEGORY FILTERING ---
+function filterCat(cat, el) {
+    document.querySelectorAll('.side-item').forEach(item => item.classList.remove('active'));
+    el.classList.add('active');
+    loadProducts(cat);
+}
+
+function loadProducts(filter = 'All') {
+    let ref = db.collection("listings").orderBy("createdAt", "desc");
+    if (filter !== 'All') ref = ref.where("category", "==", filter);
+
+    ref.onSnapshot(snap => {
+        const containers = [document.getElementById('listings'), document.getElementById('cat-listings')];
+        containers.forEach(c => {
+            if (!c) return;
+            c.innerHTML = "";
+            snap.forEach(doc => {
+                const item = doc.data();
+                c.innerHTML += `
+                    <div class="card">
+                        <img src="${item.imageUrl}" class="card-img">
+                        <div style="padding:10px;">
+                            <p style="font-size:14px; color:#333; font-weight:500;">${item.name}</p>
+                            <p style="color:var(--primary); font-weight:bold; margin-top:5px;">₵${item.price}</p>
+                        </div>
+                    </div>`;
+            });
+        });
+    });
+}
+loadProducts();
+
+// --- 5. AUTH LOGIC (FIXED) ---
 async function handleAuth() {
-    const email = document.getElementById('reg-email').value.trim(); // TRIMS EXTRA SPACES
+    const email = document.getElementById('reg-email').value.trim(); // TRIMS SPACES
     const pass = document.getElementById('reg-pass').value;
     const name = document.getElementById('reg-name').value;
-
-    if (!email || !pass) { alert("Please fill all fields."); return; }
-
-    const btn = document.getElementById('auth-submit-btn');
-    btn.innerText = "Processing...";
-    btn.disabled = true;
+    
+    if (!email || !pass) return alert("Fill all fields");
 
     try {
-        if (isLoginMode) {
-            await auth.signInWithEmailAndPassword(email, pass);
-        } else {
+        await auth.signInWithEmailAndPassword(email, pass);
+        location.reload();
+    } catch (e) {
+        try {
             const res = await auth.createUserWithEmailAndPassword(email, pass);
             await res.user.updateProfile({ displayName: name });
-        }
-        location.reload();
-    } catch (err) { alert(err.message); } finally { btn.disabled = false; }
-}
-
-function openAuth() { document.getElementById('auth-modal').style.display = 'flex'; }
-function closeAuth() { document.getElementById('auth-modal').style.display = 'none'; }
-function toggleAuthMode() {
-    isLoginMode = !isLoginMode;
-    document.getElementById('auth-title').innerText = isLoginMode ? "Welcome Back" : "Join CampusMart";
-    document.getElementById('reg-name').style.display = isLoginMode ? "none" : "block";
-}
-
-// --- 5. AUTH STATE ---
-auth.onAuthStateChanged(user => {
-    const nameEl = document.getElementById('user-display-name');
-    const emailEl = document.getElementById('user-display-email');
-    const initialEl = document.getElementById('user-initial');
-    if (user) {
-        nameEl.innerText = user.displayName || "UENR Student";
-        emailEl.innerText = user.email;
-        initialEl.innerText = (user.displayName || user.email).charAt(0).toUpperCase();
+            location.reload();
+        } catch (err) { alert(err.message); }
     }
-});
-
-function handleLogout() {
-    if(confirm("Logout?")) { auth.signOut().then(() => location.reload()); }
 }
 
-// --- 6. DATA ENGINE ---
-db.collection("listings").orderBy("createdAt", "desc").onSnapshot(snap => {
-    const container = document.getElementById('listings');
-    if (!container) return;
-    container.innerHTML = "";
-    snap.forEach(doc => {
-        const item = doc.data();
-        container.innerHTML += `
-            <div class="card">
-                <div class="card-img-container"><img src="${item.imageUrl || 'https://via.placeholder.com/150'}" class="card-img"></div>
-                <div class="card-content">
-                    <p style="font-weight:600;">${item.name}</p>
-                    <div class="card-price">₵${item.price}</div>
-                </div>
-            </div>`;
-    });
-});
-
-// --- 7. POSTING AD LOGIC ---
+// --- 6. UPLOAD ---
 async function handlePost() {
     const file = document.getElementById('itemImage').files[0];
-    if (!file) { alert("Photo required."); return; }
+    if (!file) return alert("Select a photo");
     const btn = document.getElementById('submitBtn');
-    btn.innerText = "UPLOADING...";
-    btn.disabled = true;
+    btn.innerText = "UPLOADING..."; btn.disabled = true;
+
     try {
-        const ref = storage.ref(`items/${Date.now()}_${file.name}`);
-        const task = await ref.put(file);
-        const url = await task.ref.getDownloadURL();
+        const ref = storage.ref(`items/${Date.now()}`);
+        await ref.put(file);
+        const url = await ref.getDownloadURL();
         await db.collection("listings").add({
             name: document.getElementById('itemName').value,
             price: document.getElementById('itemPrice').value,
             category: document.getElementById('itemCategory').value,
-            description: document.getElementById('itemDescription').value,
-            phone: document.getElementById('sellerPhone').value,
             imageUrl: url,
-            sellerId: auth.currentUser.uid,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
-        alert("Posted successfully!");
-        location.reload();
-    } catch (err) { alert(err.message); } finally { btn.disabled = false; }
+        alert("Live on Market!"); location.reload();
+    } catch (err) { alert(err.message); btn.disabled = false; }
 }
+
+function handleLogout() { if(confirm("Logout?")) auth.signOut().then(()=>location.reload()); }
+function closeAuth() { document.getElementById('auth-modal').style.display = 'none'; }
+
+auth.onAuthStateChanged(user => {
+    if (user) {
+        document.getElementById('user-display-name').innerText = user.displayName || "UENR Student";
+        document.getElementById('user-display-email').innerText = user.email;
+        document.getElementById('user-initial').innerText = user.email[0].toUpperCase();
+    }
+});

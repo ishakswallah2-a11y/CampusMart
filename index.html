@@ -25,9 +25,12 @@
     <header class="main-header" id="global-header">
         <div class="header-top">
             <h1 class="brand-logo">Campus<span>Mart</span></h1>
-            <div class="noti-wrapper" onclick="checkNotifications()">
-                <span class="material-symbols-outlined">notifications</span>
-                <div id="noti-count" class="noti-badge">0</div>
+            <div class="header-actions">
+                <div class="noti-wrapper" onclick="showPage('noti-page')">
+                    <span class="material-symbols-outlined">notifications</span>
+                    <div id="noti-count" class="noti-badge">1</div>
+                </div>
+                <span class="material-symbols-outlined" onclick="showPage('account-page')">settings</span>
             </div>
         </div>
         <div class="search-container">
@@ -48,6 +51,34 @@
             </div>
         </section>
 
+        <section id="cat-page" class="page">
+            <div class="category-sidebar-wrapper">
+                <div class="side-menu">
+                    <div class="side-item active" onclick="filterCat('All', this)">All Items</div>
+                    <div class="side-item" onclick="filterCat('Electronics', this)">Electronics</div>
+                    <div class="side-item" onclick="filterCat('Hostel', this)">Hostel</div>
+                    <div class="side-item" onclick="filterCat('Food', this)">Food</div>
+                    <div class="side-item" onclick="filterCat('Books', this)">Books</div>
+                </div>
+                <div class="cat-content-area">
+                    <div id="cat-listings" class="product-grid"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="noti-page" class="page">
+            <div class="container">
+                <h2 class="section-title">Notifications</h2>
+                <div class="noti-card">
+                    <span class="material-symbols-outlined">campaign</span>
+                    <div class="noti-text">
+                        <p><b>Welcome to CampusMart!</b></p>
+                        <small>Start posting your items and reach every student at UENR.</small>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section id="sell-page" class="page">
             <div class="container pro-form">
                 <h2>Post New Ad</h2>
@@ -60,36 +91,37 @@
                     <option value="Books">Books/Academic</option>
                 </select>
                 <textarea id="itemDescription" placeholder="Describe your item..."></textarea>
-                <input type="tel" id="sellerPhone" placeholder="WhatsApp Number (e.g. 054...)">
+                <input type="tel" id="sellerPhone" placeholder="WhatsApp Number">
                 <input type="file" id="itemImage" accept="image/*">
                 <button class="primary-btn" id="submitBtn" onclick="handlePost()">POST AD</button>
             </div>
         </section>
 
         <section id="account-page" class="page">
-            <div class="account-header">
-                <div class="user-info">
-                    <div class="avatar" id="user-initial">?</div>
-                    <div class="user-text">
-                        <h3 id="user-display-name">Guest Student</h3>
-                        <p id="user-display-email">Sign in to sync your data</p>
-                    </div>
-                </div>
-                <div class="settings-icons">
-                    <span class="material-symbols-outlined" onclick="checkNotifications()">notifications</span>
-                    <span class="material-symbols-outlined" onclick="openSettings()">settings</span>
+            <div class="account-header-pro">
+                <div class="avatar-large" id="user-initial">?</div>
+                <div class="user-meta">
+                    <h3 id="user-display-name">Guest Student</h3>
+                    <p id="user-display-email">Join the community</p>
                 </div>
             </div>
+            
             <div class="container">
-                <div class="account-menu">
-                    <div class="menu-item" onclick="showPage('ads-page', null)">
-                        <span class="material-symbols-outlined">inventory_2</span><p>My Ads</p>
+                <div class="pro-menu-group">
+                    <div class="pro-menu-item" onclick="showPage('ads-page')">
+                        <span class="material-symbols-outlined">inventory_2</span><p>My Store Listings</p>
                     </div>
-                    <div class="menu-item" onclick="alert('Syncing Wishlist...')">
-                        <span class="material-symbols-outlined">favorite</span><p>Wishlist</p>
+                    <div class="pro-menu-item" onclick="alert('Wishlist syncing...')">
+                        <span class="material-symbols-outlined">favorite</span><p>My Wishlist</p>
                     </div>
-                    <div class="menu-item logout" onclick="handleLogout()">
-                        <span class="material-symbols-outlined">logout</span><p>Logout</p>
+                    <div class="pro-menu-item" onclick="showPage('noti-page')">
+                        <span class="material-symbols-outlined">notifications</span><p>Message Center</p>
+                    </div>
+                </div>
+
+                <div class="pro-menu-group">
+                    <div class="pro-menu-item logout-btn" onclick="handleLogout()">
+                        <span class="material-symbols-outlined">logout</span><p>Sign Out</p>
                     </div>
                 </div>
             </div>
@@ -103,7 +135,7 @@
             <input type="email" id="reg-email" placeholder="Email Address">
             <input type="password" id="reg-pass" placeholder="Password">
             <button class="primary-btn" id="auth-submit-btn" onclick="handleAuth()">CONTINUE</button>
-            <p onclick="toggleAuthMode()" style="text-align:center; margin-top:15px; cursor:pointer; color:var(--primary); font-weight:bold;">Already have an account? Login</p>
+            <p onclick="toggleAuthMode()" style="text-align:center; margin-top:15px; cursor:pointer; color:var(--primary); font-weight:bold;">Switch Login/Register</p>
             <button class="primary-btn" style="background:#888; margin-top:10px;" onclick="closeAuth()">CLOSE</button>
         </div>
     </div>
@@ -112,7 +144,6 @@
         <div class="nav-tab active" onclick="showPage('home-page', this)"><span class="material-symbols-outlined">home</span><p>Home</p></div>
         <div class="nav-tab" onclick="showPage('cat-page', this)"><span class="material-symbols-outlined">grid_view</span><p>Category</p></div>
         <div class="nav-tab sell-btn" onclick="showPage('sell-page', this)"><span class="material-symbols-outlined">add_circle</span><p>Sell</p></div>
-        <div class="nav-tab" onclick="showPage('ads-page', this)"><span class="material-symbols-outlined">inventory_2</span><p>Ads</p></div>
         <div class="nav-tab" onclick="showPage('account-page', this)"><span class="material-symbols-outlined">person</span><p>Account</p></div>
     </nav>
 
