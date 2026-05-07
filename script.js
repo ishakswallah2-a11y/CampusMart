@@ -1,3 +1,13 @@
+// --- SPLASH SCREEN LOGIC ---
+window.addEventListener('load', () => {
+    const splash = document.getElementById('splash-screen');
+    
+    // Show splash for 3 seconds, then hide smoothly
+    setTimeout(() => {
+        splash.classList.add('fade-out');
+    }, 3000); 
+});
+
 // --- NAVIGATION LOGIC ---
 function showPage(pageId, el) {
     const user = firebase.auth().currentUser;
@@ -8,15 +18,19 @@ function showPage(pageId, el) {
         return;
     }
 
+    // Hide all pages and show the selected one
     document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
     document.getElementById(pageId).style.display = 'block';
     
+    // Update active tab styling
     document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
     if(el) el.classList.add('active');
 
-    // Header Bell Logic
+    // Header Bell Logic: Hide notification bell on account page
     const globalBell = document.getElementById('main-noti');
-    globalBell.style.display = (pageId === 'account-page') ? 'none' : 'block';
+    if (globalBell) {
+        globalBell.style.display = (pageId === 'account-page') ? 'none' : 'block';
+    }
 
     window.scrollTo(0,0);
 }
@@ -57,12 +71,12 @@ async function handleAuth() {
     }
 }
 
+// Listen for Auth State Changes
 firebase.auth().onAuthStateChanged(user => {
     if (user) {
         document.getElementById('user-display-name').innerText = user.displayName || "Student";
         document.getElementById('user-display-email').innerText = user.email;
         document.getElementById('user-initial').innerText = user.displayName ? user.displayName[0].toUpperCase() : "U";
-        document.getElementById('my-listings-container').innerHTML = `<p style="text-align:center; color:#2e7d32;">Logged in as ${user.displayName}</p>`;
     } else {
         document.getElementById('user-display-name').innerText = "Guest Student";
         document.getElementById('user-display-email').innerText = "Login to see your profile";
@@ -72,7 +86,7 @@ firebase.auth().onAuthStateChanged(user => {
 
 function handleLogout() {
     firebase.auth().signOut().then(() => {
-        alert("Logged out");
+        alert("Logged out successfully");
         showPage('home-page', document.querySelector('.nav-tab'));
     });
 }
@@ -80,11 +94,10 @@ function handleLogout() {
 function openAuth() { document.getElementById('auth-modal').style.display = 'flex'; }
 function closeAuth() { document.getElementById('auth-modal').style.display = 'none'; }
 
-// --- NOTIFICATION LOGIC (FIXED: NO FAKE NUMBERS) ---
+// --- NOTIFICATION LOGIC (REAL-TIME DATA) ---
 db.collection("listings").onSnapshot(snap => {
     const badge = document.getElementById('noti-count');
-    // For now, we only show it if there's a real new item count we want to track
-    let realCount = 0; 
+    let realCount = 0; // You can implement specific logic here to count new items
     
     if (realCount > 0) {
         badge.innerText = realCount;
@@ -94,7 +107,7 @@ db.collection("listings").onSnapshot(snap => {
     }
 });
 
-// --- LISTING LOGIC (FIREBASE ONLY: NO DEFAULT ITEMS) ---
+// --- LISTING LOGIC (HOME FEED) ---
 db.collection("listings").orderBy("createdAt", "desc").onSnapshot(snap => {
     const container = document.getElementById('listings');
     container.innerHTML = "";
@@ -149,12 +162,12 @@ function filterCategory(cat, el) {
     });
 }
 
-// --- POSTING LOGIC ---
+// --- POSTING LOGIC (SMOOTH TRANSITION) ---
 document.getElementById('postItemForm').onsubmit = async (e) => {
     e.preventDefault();
     const btn = document.getElementById('submitBtn');
     const file = document.getElementById('itemImage').files[0];
-    if (!file) return alert("Select a photo!");
+    if (!file) return alert("Please select a photo of your item!");
 
     btn.innerText = "⏳ UPLOADING...";
     btn.disabled = true;
@@ -174,27 +187,38 @@ document.getElementById('postItemForm').onsubmit = async (e) => {
             sellerId: firebase.auth().currentUser.uid,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
-        alert("Posted!");
-        location.reload();
+
+        alert("Success! Your item is now live on CampusMart.");
+        
+        // Reset the form and UI
+        document.getElementById('postItemForm').reset();
+        document.getElementById('imagePreview').style.display = "none";
+        document.getElementById('upload-text').style.display = "block";
+        
+        // Navigate back to home instead of refreshing the whole page
+        showPage('home-page', document.querySelector('.nav-tab'));
+        
     } catch (err) {
-        alert("Error uploading.");
+        console.error(err);
+        alert("Error uploading. Please try again.");
+    } finally {
+        btn.innerText = "POST AD";
         btn.disabled = false;
     }
 };
 
-// --- UTILS (FIXED: AGENT MESSAGE ADDED) ---
+// --- UTILS & MODALS ---
 function openDetails(id) {
     db.collection("listings").doc(id).get().then(doc => {
         const data = doc.data();
-        // Automatic Agent Message
         const message = encodeURIComponent(`Hello, I saw your item "${data.name}" on CampusMart. Is it still available?`);
         const whatsappURL = `https://wa.me/${data.phone}?text=${message}`;
 
         document.getElementById('modalBody').innerHTML = `
-            <img src="${data.imageUrl}" style="width:100%; border-radius:15px;">
-            <h2 style="margin-top:15px;">${data.name}</h2>
+            <img src="${data.imageUrl}" style="width:100%; border-radius:15px; margin-bottom:15px;">
+            <h2>${data.name}</h2>
             <h3 style="color:#2e7d32; margin:10px 0;">GHS ${data.price}</h3>
-            <p>${data.description}</p>
+            <p style="color:#555; line-height:1.5;">${data.description}</p>
             <a href="${whatsappURL}" target="_blank" class="wa-contact-btn">CHAT ON WHATSAPP</a>`;
         document.getElementById('viewModal').style.display = 'flex';
     });
@@ -202,6 +226,7 @@ function openDetails(id) {
 
 function closeModal() { document.getElementById('viewModal').style.display = 'none'; }
 
+// Image Preview Utility
 document.getElementById('itemImage').onchange = (e) => {
     const file = e.target.files[0];
     if(file) {
