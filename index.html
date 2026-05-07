@@ -14,7 +14,7 @@
             <h1 class="brand-logo">Campus<span>Mart</span></h1>
             <div class="noti-wrapper" id="main-noti">
                 <span class="material-symbols-outlined">notifications</span>
-                <div id="noti-count" class="noti-badge"></div>
+                <div id="noti-count" class="noti-badge" style="display: none;"></div>
             </div>
         </div>
         <div class="search-container">
@@ -97,21 +97,31 @@
                     </div>
                 </div>
                 <div class="settings-icons">
-                    <span class="material-symbols-outlined">notifications</span>
-                    <span class="material-symbols-outlined">settings</span>
+                    <span class="material-symbols-outlined" onclick="alert('No new notifications')">notifications</span>
+                    <span class="material-symbols-outlined" onclick="alert('Settings coming soon')">settings</span>
                 </div>
             </div>
 
             <div class="container">
                 <div class="account-menu">
-                    <div class="menu-item" onclick="showPage('ads-page', document.querySelector('.nav-tab:nth-child(4)'))"><span class="material-symbols-outlined">inventory_2</span><p>My Ads</p></div>
-                    <div class="menu-item"><span class="material-symbols-outlined">favorite</span><p>Wishlist</p></div>
-                    <div class="menu-item"><span class="material-symbols-outlined">visibility</span><p>Recently Viewed</p></div>
-                    <div class="menu-item"><span class="material-symbols-outlined">help</span><p>Help & Support</p></div>
+                    <div class="menu-item" onclick="showPage('ads-page', document.querySelector('.nav-tab:nth-child(4)'))">
+                        <span class="material-symbols-outlined">inventory_2</span><p>My Ads</p>
+                    </div>
+                    <div class="menu-item" onclick="alert('Wishlist coming soon!')">
+                        <span class="material-symbols-outlined">favorite</span><p>Wishlist</p>
+                    </div>
+                    <div class="menu-item" onclick="alert('Recently viewed coming soon!')">
+                        <span class="material-symbols-outlined">visibility</span><p>Recently Viewed</p>
+                    </div>
+                    <div class="menu-item" onclick="window.location.href='mailto:support@campusmart.com'">
+                        <span class="material-symbols-outlined">help</span><p>Help & Support</p>
+                    </div>
                 </div>
 
                 <div class="account-menu">
-                    <div class="menu-item logout" onclick="handleLogout()"><span class="material-symbols-outlined">logout</span><p>Logout</p></div>
+                    <div class="menu-item logout" onclick="handleLogout()">
+                        <span class="material-symbols-outlined">logout</span><p>Logout</p>
+                    </div>
                 </div>
             </div>
         </section>
@@ -128,7 +138,7 @@
     <div id="auth-modal" class="modal-overlay">
         <div class="modal-box">
             <span class="close-x" onclick="closeAuth()">&times;</span>
-            <h2 id="auth-title" style="margin-bottom: 20px; color: var(--primary);">Join CampusMart</h2>
+            <h2 id="auth-title" style="margin-bottom: 20px; color: #2e7d32;">Join CampusMart</h2>
             <div class="pro-form">
                 <input type="text" id="reg-name" placeholder="Full Name">
                 <input type="email" id="reg-email" placeholder="Email (UENR or Gmail)">
@@ -136,7 +146,7 @@
                 <button class="primary-btn" onclick="handleAuth()" id="auth-submit-btn">CREATE ACCOUNT</button>
                 <p style="text-align: center; margin-top: 15px; font-size: 14px;">
                     <span id="auth-toggle-text">Already have an account?</span> 
-                    <a href="#" onclick="toggleAuthMode()" id="auth-toggle-link" style="color: var(--primary); font-weight: bold;">Login</a>
+                    <a href="#" onclick="toggleAuthMode()" id="auth-toggle-link" style="color: #2e7d32; font-weight: bold;">Login</a>
                 </p>
             </div>
         </div>

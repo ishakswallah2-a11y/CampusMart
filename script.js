@@ -80,22 +80,28 @@ function handleLogout() {
 function openAuth() { document.getElementById('auth-modal').style.display = 'flex'; }
 function closeAuth() { document.getElementById('auth-modal').style.display = 'none'; }
 
-// --- NOTIFICATION LOGIC (NO DEFAULT NUMBERS) ---
+// --- NOTIFICATION LOGIC (FIXED: NO FAKE NUMBERS) ---
 db.collection("listings").onSnapshot(snap => {
     const badge = document.getElementById('noti-count');
-    const newItems = snap.size; 
-    if (newItems > 0) {
-        badge.innerText = newItems;
+    // For now, we only show it if there's a real new item count we want to track
+    let realCount = 0; 
+    
+    if (realCount > 0) {
+        badge.innerText = realCount;
         badge.style.display = "flex";
     } else {
         badge.style.display = "none";
     }
 });
 
-// --- LISTING LOGIC ---
+// --- LISTING LOGIC (FIREBASE ONLY: NO DEFAULT ITEMS) ---
 db.collection("listings").orderBy("createdAt", "desc").onSnapshot(snap => {
     const container = document.getElementById('listings');
     container.innerHTML = "";
+    if (snap.empty) {
+        container.innerHTML = "<p style='padding:20px; text-align:center; color:#888;'>No listings available yet.</p>";
+        return;
+    }
     snap.forEach(doc => {
         const item = doc.data();
         container.innerHTML += `
@@ -108,6 +114,40 @@ db.collection("listings").orderBy("createdAt", "desc").onSnapshot(snap => {
             </div>`;
     });
 });
+
+// --- CATEGORY FILTER LOGIC ---
+function filterCategory(cat, el) {
+    document.querySelectorAll('.cat-item').forEach(item => item.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('selected-cat-name').innerText = cat;
+
+    const resultsContainer = document.getElementById('category-results');
+    resultsContainer.innerHTML = "<p style='text-align:center; padding:20px;'>Loading...</p>";
+
+    let query = db.collection("listings");
+    if (cat !== 'All') {
+        query = query.where("category", "==", cat);
+    }
+
+    query.get().then(snap => {
+        resultsContainer.innerHTML = "";
+        if (snap.empty) {
+            resultsContainer.innerHTML = "<p style='padding:40px; text-align:center; color:#888;'>No items found in this category.</p>";
+            return;
+        }
+        snap.forEach(doc => {
+            const item = doc.data();
+            resultsContainer.innerHTML += `
+                <div class="card" onclick="openDetails('${doc.id}')">
+                    <img src="${item.imageUrl}" class="card-img">
+                    <div class="card-content">
+                        <p style="font-size:0.9rem; margin-bottom:5px;">${item.name}</p>
+                        <div class="card-price">GHS ${item.price}</div>
+                    </div>
+                </div>`;
+        });
+    });
+}
 
 // --- POSTING LOGIC ---
 document.getElementById('postItemForm').onsubmit = async (e) => {
@@ -142,19 +182,24 @@ document.getElementById('postItemForm').onsubmit = async (e) => {
     }
 };
 
-// --- UTILS ---
+// --- UTILS (FIXED: AGENT MESSAGE ADDED) ---
 function openDetails(id) {
     db.collection("listings").doc(id).get().then(doc => {
         const data = doc.data();
+        // Automatic Agent Message
+        const message = encodeURIComponent(`Hello, I saw your item "${data.name}" on CampusMart. Is it still available?`);
+        const whatsappURL = `https://wa.me/${data.phone}?text=${message}`;
+
         document.getElementById('modalBody').innerHTML = `
             <img src="${data.imageUrl}" style="width:100%; border-radius:15px;">
             <h2 style="margin-top:15px;">${data.name}</h2>
-            <h3 style="color:var(--primary); margin:10px 0;">GHS ${data.price}</h3>
+            <h3 style="color:#2e7d32; margin:10px 0;">GHS ${data.price}</h3>
             <p>${data.description}</p>
-            <a href="https://wa.me/${data.phone}" class="wa-contact-btn">CHAT ON WHATSAPP</a>`;
+            <a href="${whatsappURL}" target="_blank" class="wa-contact-btn">CHAT ON WHATSAPP</a>`;
         document.getElementById('viewModal').style.display = 'flex';
     });
 }
+
 function closeModal() { document.getElementById('viewModal').style.display = 'none'; }
 
 document.getElementById('itemImage').onchange = (e) => {
