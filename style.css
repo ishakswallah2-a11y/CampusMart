@@ -26,92 +26,55 @@ body {
 
 .noti-wrapper { position: relative; cursor: pointer; }
 .noti-wrapper span { font-size: 30px; color: #444; }
-
 .noti-badge { 
-    position: absolute; 
-    top: -2px; 
-    right: -2px; 
-    background: #d32f2f; 
-    color: white; 
-    font-size: 10px; 
-    font-weight: bold;
-    width: 18px; 
-    height: 18px; 
-    border-radius: 50%; 
-    display: none; 
-    align-items: center; 
-    justify-content: center; 
-    border: 2px solid var(--white); 
+    position: absolute; top: -2px; right: -2px; background: #d32f2f; color: white; 
+    font-size: 10px; font-weight: bold; width: 18px; height: 18px; border-radius: 50%; 
+    display: none; align-items: center; justify-content: center; border: 2px solid var(--white); 
 }
 
-.search-container { background: #f0f2f1; display: flex; align-items: center; padding: 12px 15px; border-radius: 25px; border: 1px solid #ddd; transition: 0.3s; }
-.search-container:focus-within { background: var(--white); border-color: var(--primary); }
+.search-container { background: #f0f2f1; display: flex; align-items: center; padding: 12px 15px; border-radius: 25px; border: 1px solid #ddd; }
 .search-container input { border: none; background: transparent; width: 100%; margin-left: 10px; font-size: 16px; outline: none; }
 
-/* --- NEW PROMO BANNER (Professional Style) --- */
-.promo-banner { 
-    background: linear-gradient(90deg, var(--primary), #1b5e20); 
-    color: white; 
-    padding: 15px; 
-    margin: 10px 15px; 
-    border-radius: 12px; 
-    display: flex; 
-    align-items: center; 
-    gap: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-.promo-banner span { font-size: 24px; color: var(--accent); }
-.promo-banner p { font-weight: 700; font-size: 0.9rem; }
-
-/* --- BOTTOM NAV --- */
-.bottom-nav { position: fixed; bottom: 0; width: 100%; background: var(--white); height: 85px; display: flex; justify-content: space-around; align-items: center; border-top: 2px solid #eee; box-shadow: 0 -5px 15px rgba(0,0,0,0.05); z-index: 1000; }
-.nav-tab { text-align: center; color: #777; flex: 1; cursor: pointer; transition: 0.2s; }
-.nav-tab.active { color: var(--primary); }
-.nav-tab span { font-size: 30px; }
-.nav-tab p { font-size: 11px; font-weight: 700; }
-.sell-btn { color: var(--accent); }
-
-/* --- GRID & CARDS --- */
-.container { padding: 10px 15px; }
-.product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.card { background: var(--white); border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: 0.2s; cursor: pointer; }
-.card:active { transform: scale(0.97); }
-
-/* Fix for inconsistent image heights */
-.card-img-container { width: 100%; aspect-ratio: 1/1; background: #eee; overflow: hidden; }
-.card-img { width: 100%; height: 100%; object-fit: cover; }
-
-.card-content { padding: 10px; }
-.card-price { color: var(--primary); font-weight: 800; }
-
-/* --- CATEGORY LAYOUT --- */
-.category-container { display: flex; height: calc(100vh - 220px); overflow: hidden; background: var(--white); }
-.cat-sidebar { width: 30%; background: #f8f9f8; overflow-y: auto; border-right: 1px solid #eee; }
-.cat-item { padding: 20px 15px; font-size: 0.85rem; font-weight: 600; border-left: 4px solid transparent; transition: 0.2s; cursor: pointer; }
-.cat-item.active { background: var(--white); color: var(--primary); border-left-color: var(--primary); }
-.cat-content { width: 70%; padding: 15px; overflow-y: auto; }
-
-/* --- ACCOUNT SECTION --- */
-.account-header { display: flex; justify-content: space-between; align-items: center; padding: 25px 15px; background: var(--white); border-bottom: 1px solid #eee; }
-.user-info { display: flex; align-items: center; }
-.avatar { width: 60px; height: 60px; background: var(--primary); border-radius: 50%; color: var(--white); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; margin-right: 12px; }
-.settings-icons { display: flex; gap: 15px; color: #555; }
-.settings-icons span { font-size: 26px; cursor: pointer; padding: 5px; transition: 0.2s; }
-.settings-icons span:active { background: #eee; border-radius: 50%; }
-
-/* --- FORMS --- */
-.pro-form input, .pro-form select, .pro-form textarea { width: 100%; padding: 14px; margin-bottom: 12px; border-radius: 10px; border: 1px solid #ddd; outline: none; font-size: 16px; }
-.primary-btn { width: 100%; background: var(--primary); color: var(--white); border: none; padding: 18px; border-radius: 12px; font-weight: 800; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 12px rgba(46,125,50,0.3); transition: 0.2s; }
-
-/* --- MODALS --- */
-.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
-.modal-box { background: var(--white); width: 100%; max-width: 450px; padding: 20px; border-radius: 20px; position: relative; max-height: 90vh; overflow-y: auto; }
-
-/* --- SPLASH SCREEN --- */
+/* --- SPLASH SCREEN (FIXED) --- */
 #splash-screen {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
     display: flex; justify-content: center; align-items: center; z-index: 9999;
 }
-.splash-content { text-align: center; color: white; }
+.splash-content { text-align: center; color: white; width: 80%; }
+.splash-logo span { font-size: 60px !important; margin: 0 5px; }
+.graduation-icon { color: white; }
+.basket-icon { color: var(--accent); }
+.splash-text { font-size: 32px; font-weight: 900; margin: 15px 0; }
+.splash-text span { color: var(--accent); }
+
+.loading-bar { width: 100%; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; overflow: hidden; margin-top: 20px; }
+.loading-progress { width: 0%; height: 100%; background: var(--accent); transition: width 2s ease-in-out; }
+
 .fade-out { opacity: 0; visibility: hidden; pointer-events: none; transition: 0.8s; }
+
+/* --- CARDS & GRID --- */
+.container { padding: 10px 15px; }
+.product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
+.card { background: var(--white); border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+.card-img-container { width: 100%; aspect-ratio: 1/1; background: #eee; }
+.card-img { width: 100%; height: 100%; object-fit: cover; }
+.card-content { padding: 10px; }
+.card-price { color: var(--primary); font-weight: 800; font-size: 1.1rem; }
+
+/* --- ACCOUNT PAGE --- */
+.account-header { display: flex; justify-content: space-between; align-items: center; padding: 25px 15px; background: var(--white); }
+.avatar { width: 60px; height: 60px; background: var(--primary); border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; margin-right: 15px; }
+.account-menu { background: var(--white); border-radius: 15px; margin-top: 15px; overflow: hidden; }
+.menu-item { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #f0f0f0; cursor: pointer; }
+.menu-item span { margin-right: 15px; color: #555; }
+.logout { color: #d32f2f; }
+.logout span { color: #d32f2f; }
+
+/* --- NAVIGATION --- */
+.bottom-nav { position: fixed; bottom: 0; width: 100%; background: var(--white); height: 85px; display: flex; justify-content: space-around; align-items: center; border-top: 2px solid #eee; z-index: 1000; }
+.nav-tab { text-align: center; color: #777; flex: 1; cursor: pointer; }
+.nav-tab.active { color: var(--primary); }
+.nav-tab span { font-size: 28px; }
+.nav-tab p { font-size: 10px; font-weight: bold; }
+.sell-btn { color: var(--accent); }
