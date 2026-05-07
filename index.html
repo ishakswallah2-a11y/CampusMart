@@ -13,7 +13,7 @@
         <div class="splash-content">
             <div class="splash-logo">
                 <span class="material-symbols-outlined graduation-icon">school</span>
-                <span class="material-symbols-outlined basket-icon">shopping_basket</span>
+                <span class="material-symbols-outlined trolley-icon">shopping_cart</span>
             </div>
             <h1 class="splash-text">Campus<span>Mart</span></h1>
             <div class="loading-bar">
@@ -48,6 +48,24 @@
             </div>
         </section>
 
+        <section id="sell-page" class="page">
+            <div class="container pro-form">
+                <h2>Post New Ad</h2>
+                <input type="text" id="itemName" placeholder="Item Name">
+                <input type="number" id="itemPrice" placeholder="Price (GHS)">
+                <select id="itemCategory">
+                    <option value="Electronics">Electronics</option>
+                    <option value="Hostel">Hostel Items</option>
+                    <option value="Food">Food/Groceries</option>
+                    <option value="Books">Books/Academic</option>
+                </select>
+                <textarea id="itemDescription" placeholder="Describe your item..."></textarea>
+                <input type="tel" id="sellerPhone" placeholder="WhatsApp Number (e.g. 054...)">
+                <input type="file" id="itemImage" accept="image/*">
+                <button class="primary-btn" id="submitBtn" onclick="handlePost()">POST AD</button>
+            </div>
+        </section>
+
         <section id="account-page" class="page">
             <div class="account-header">
                 <div class="user-info">
@@ -62,24 +80,14 @@
                     <span class="material-symbols-outlined" onclick="openSettings()">settings</span>
                 </div>
             </div>
-
             <div class="container">
                 <div class="account-menu">
-                    <div class="menu-item" onclick="showPage('ads-page', document.querySelector('.nav-tab:nth-child(4)'))">
+                    <div class="menu-item" onclick="showPage('ads-page', null)">
                         <span class="material-symbols-outlined">inventory_2</span><p>My Ads</p>
                     </div>
-                    <div class="menu-item" onclick="alert('Wishlist: Your saved items are being synced...')">
+                    <div class="menu-item" onclick="alert('Syncing Wishlist...')">
                         <span class="material-symbols-outlined">favorite</span><p>Wishlist</p>
                     </div>
-                    <div class="menu-item" onclick="alert('Recently Viewed: Tracking your history...')">
-                        <span class="material-symbols-outlined">visibility</span><p>Recently Viewed</p>
-                    </div>
-                    <div class="menu-item" onclick="window.location.href='mailto:support@campusmart.com'">
-                        <span class="material-symbols-outlined">help</span><p>Help & Support</p>
-                    </div>
-                </div>
-
-                <div class="account-menu">
                     <div class="menu-item logout" onclick="handleLogout()">
                         <span class="material-symbols-outlined">logout</span><p>Logout</p>
                     </div>
@@ -87,6 +95,18 @@
             </div>
         </section>
     </main>
+
+    <div id="auth-modal" class="modal-overlay">
+        <div class="modal-box pro-form">
+            <h2 id="auth-title">Join CampusMart</h2>
+            <input type="text" id="reg-name" placeholder="Full Name">
+            <input type="email" id="reg-email" placeholder="Email Address">
+            <input type="password" id="reg-pass" placeholder="Password">
+            <button class="primary-btn" id="auth-submit-btn" onclick="handleAuth()">CONTINUE</button>
+            <p onclick="toggleAuthMode()" style="text-align:center; margin-top:15px; cursor:pointer; color:var(--primary); font-weight:bold;">Already have an account? Login</p>
+            <button class="primary-btn" style="background:#888; margin-top:10px;" onclick="closeAuth()">CLOSE</button>
+        </div>
+    </div>
 
     <nav class="bottom-nav">
         <div class="nav-tab active" onclick="showPage('home-page', this)"><span class="material-symbols-outlined">home</span><p>Home</p></div>
