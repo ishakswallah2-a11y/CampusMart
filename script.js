@@ -63,6 +63,7 @@ document.getElementById('postItemForm').onsubmit = async (e) => {
             price: document.getElementById('itemPrice').value,
             description: document.getElementById('itemDescription').value,
             phone: document.getElementById('sellerPhone').value,
+            category: document.getElementById('itemCategory').value, // Ensure this ID exists in HTML
             imageUrl: downloadURL,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
@@ -84,7 +85,6 @@ function openDetails(docId) {
             const data = doc.data();
             const modalBody = document.getElementById('modalBody');
             
-            // This section now includes the WhatsApp SVG icon for uniqueness
             modalBody.innerHTML = `
                 <img src="${data.imageUrl}" style="width:100%; border-radius:15px; margin-bottom:20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
                 <h2 style="color:var(--primary);">${data.name}</h2>
@@ -113,7 +113,6 @@ function closeModal() {
 // --- ACCOUNT PAGE LOGIC ---
 document.querySelectorAll('.menu-item').forEach(item => {
     item.addEventListener('click', function() {
-        // Safe check for the <p> tag text content
         const pTag = this.querySelector('p');
         if (!pTag) return;
         
@@ -130,7 +129,6 @@ document.querySelectorAll('.menu-item').forEach(item => {
                 alert("Recently viewed items will appear here soon.");
                 break;
             case 'Help & Support':
-                // Update with your real number so students can reach you
                 window.location.href = "https://wa.me/233540000000?text=Hello%20Ishak,%20I%20need%20help%20with%20CampusMart";
                 break;
             case 'Logout':
@@ -141,3 +139,72 @@ document.querySelectorAll('.menu-item').forEach(item => {
         }
     });
 });
+
+// --- CATEGORY FILTERING LOGIC ---
+function filterCategory(categoryName, element) {
+    document.querySelectorAll('.cat-item').forEach(item => item.classList.remove('active'));
+    element.classList.add('active');
+    document.getElementById('selected-cat-name').innerText = categoryName;
+
+    const resultsDiv = document.getElementById('category-results');
+    resultsDiv.innerHTML = "<p>Loading...</p>";
+
+    let query = db.collection("listings");
+    
+    if (categoryName !== 'All') {
+        query = query.where("category", "==", categoryName);
+    }
+
+    query.orderBy("createdAt", "desc").get().then((snapshot) => {
+        resultsDiv.innerHTML = "";
+        if (snapshot.empty) {
+            resultsDiv.innerHTML = "<p style='grid-column: 1/-1; text-align:center; padding:20px;'>No items found in this category.</p>";
+            return;
+        }
+
+        snapshot.forEach((doc) => {
+            const item = doc.data();
+            const id = doc.id;
+            resultsDiv.innerHTML += `
+                <div class="card" onclick="openDetails('${id}')">
+                    <img src="${item.imageUrl}" class="card-img">
+                    <div class="card-content">
+                        <p style="font-size:0.8rem; line-height:1.2; height:30px; overflow:hidden;">${item.name}</p>
+                        <div class="card-price" style="font-size:0.9rem;">GHS ${item.price}</div>
+                    </div>
+                </div>
+            `;
+        });
+    }).catch(err => {
+        console.error("Filter error:", err);
+        resultsDiv.innerHTML = "<p>Error loading items. Make sure your indexes are set in Firebase.</p>";
+    });
+
+    // Initialize a variable to skip the first load
+let initialLoad = true;
+
+db.collection("listings").onSnapshot((snapshot) => {
+    if (initialLoad) {
+        initialLoad = false; // We skip the very first data sync
+        return;
+    }
+
+    let newItemsCount = 0;
+    snapshot.docChanges().forEach((change) => {
+        // Only count if a document was JUST added to the database
+        if (change.type === "added") {
+            newItemsCount++;
+        }
+    });
+
+    if (newItemsCount > 0) {
+        const badge = document.getElementById('noti-count');
+        // If there's already a number there, add to it
+        let currentCount = parseInt(badge.innerText) || 0;
+        badge.innerText = currentCount + newItemsCount;
+        badge.style.display = "flex";
+    }
+});
+
+}
+

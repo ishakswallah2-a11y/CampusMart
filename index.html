@@ -52,15 +52,22 @@
         </section>
 
         <section id="cat-page" class="page" style="display:none;">
-            <div class="container">
-                <h2 class="section-title">Categories</h2>
-                <div class="category-grid">
-                    <div class="cat-card"><span class="material-symbols-outlined">devices</span><p>Tech</p></div>
-                    <div class="cat-card"><span class="material-symbols-outlined">menu_book</span><p>Books</p></div>
-                    <div class="cat-card"><span class="material-symbols-outlined">bed</span><p>Hostel</p></div>
+    <div class="category-container" style="display: flex; height: calc(100vh - 225px);">
+        <div class="cat-sidebar" style="width: 30%; background: #eee; overflow-y: auto;">
+            <div class="cat-item active" onclick="filterCategory('All', this)">All</div>
+            <div class="cat-item" onclick="filterCategory('Phones', this)">Phones</div>
+            <div class="cat-item" onclick="filterCategory('Electronics', this)">Electronics</div>
+            <div class="cat-item" onclick="filterCategory('Fashion', this)">Fashion</div>
+            <div class="cat-item" onclick="filterCategory('Hostel', this)">Hostel</div>
+            <div class="cat-item" onclick="filterCategory('Books', this)">Books</div>
+        </div>
+        <div class="cat-content" style="width: 70%; padding: 10px; overflow-y: auto; background: #fff;">
+            <h3 id="selected-cat-name" style="margin-bottom: 15px; font-size: 1rem;">All Items</h3>
+            <div id="category-results" class="product-grid">
                 </div>
-            </div>
-        </section>
+        </div>
+    </div>
+</section>
 
         <section id="ads-page" class="page" style="display:none;">
             <div class="container">
@@ -147,5 +154,20 @@
         <div class="nav-tab" onclick="showPage('ads-page', this)"><span class="material-symbols-outlined">inventory_2</span><p>Ads</p></div>
         <div class="nav-tab" onclick="showPage('account-page', this)"><span class="material-symbols-outlined">person</span><p>Account</p></div>
     </nav>
+
+    <form id="postItemForm" class="pro-form">
+    <input type="number" id="itemPrice" placeholder="Price (GHS)" required>
+
+    <select id="itemCategory" style="width: 100%; padding: 14px; margin-bottom: 12px; border-radius: 10px; border: 1px solid #ddd; font-size: 16px; background: white;" required>
+        <option value="" disabled selected>Select Category</option>
+        <option value="Phones">Phones</option>
+        <option value="Electronics">Electronics</option>
+        <option value="Fashion">Fashion</option>
+        <option value="Hostel">Hostel</option>
+        <option value="Books">Books</option>
+    </select>
+
+    <textarea id="itemDescription" placeholder="Provide details..." rows="5"></textarea>
+    </form>
 </body>
 </html>
