@@ -140,3 +140,29 @@ body { background: var(--bg); padding-top: 135px; padding-bottom: 110px; }
 .menu-item.logout span, .menu-item.logout p {
     color: #d32f2f;
 }
+.wa-contact-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: #25d366; /* Official WhatsApp Green */
+    color: white;
+    text-decoration: none;
+    padding: 18px;
+    border-radius: 15px;
+    margin-top: 25px;
+    font-weight: 800;
+    font-size: 1.1rem;
+    transition: transform 0.2s, background 0.2s;
+    box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+}
+
+.wa-contact-btn:active {
+    transform: scale(0.96);
+    background: #1ebc57;
+}
+
+.wa-contact-btn svg {
+    width: 28px;
+    height: 28px;
+}
