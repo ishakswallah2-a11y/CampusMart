@@ -106,3 +106,32 @@ function openDetails(docId) {
 function closeModal() {
     document.getElementById('viewModal').style.display = "none";
 }
+// --- ACCOUNT PAGE LOGIC ---
+
+// Selecting all menu items in the account page
+document.querySelectorAll('.menu-item').forEach(item => {
+    item.addEventListener('click', function() {
+        const action = this.querySelector('p').innerText;
+
+        switch(action) {
+            case 'My Ads':
+                showPage('ads-page', document.querySelector('.nav-tab:nth-child(4)'));
+                break;
+            case 'Wishlist':
+                alert("Wishlist feature coming soon! You'll be able to save your favorite campus deals here.");
+                break;
+            case 'Recently Viewed':
+                alert("History feature coming soon!");
+                break;
+            case 'Help & Support':
+                // Opens WhatsApp directly to you for support
+                window.location.href = "https://wa.me/233540000000?text=I%20need%20help%20with%20CampusMart";
+                break;
+            case 'Logout':
+                if(confirm("Are you sure you want to logout?")) {
+                    location.reload(); // Simple reset for now
+                }
+                break;
+        }
+    });
+});
